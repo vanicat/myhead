@@ -1,0 +1,532 @@
+% Copyright 2008 by Till Tantau and Mark Wibrow
+%
+% This file may be distributed and/or modified
+%
+% 1. under the LaTeX Project Public License and/or
+% 2. under the GNU Public License.
+%
+% See the file doc/generic/pgf/licenses/LICENSE for more details.
+
+\ProvidesPackageRCS[v\pgfversion] $Header: /cvsroot/pgf/pgf/generic/pgf/utilities/pgffor.code.tex,v 1.17 2010/02/22 22:49:21 tantau Exp $
+
+
+\newdimen\pgffor@iter
+\newdimen\pgffor@skip
+\newif\ifpgffor@continue
+
+\let\pgffor@beginhook=\pgfutil@empty
+\let\pgffor@endhook=\pgfutil@empty
+\let\pgffor@afterhook=\pgfutil@empty
+
+\def\pgffor@emptyvalues{, \pgffor@stop,}%
+
+\pgfkeys{/pgf/foreach/.cd,
+	var/.code=\pgffor@var@add#1\pgffor@stop,
+	evaluate/.code=\pgffor@var@evaluate#1\pgffor@@stop,
+	remember/.code=%
+		\pgfutil@in@({#1}%)
+		\ifpgfutil@in@%
+			\pgffor@var@remember#1\pgffor@@stop%
+		\else%
+			\pgffor@var@remember#1(initially 0)\pgffor@@stop%
+		\fi,%
+	count/.code=%
+		\pgfutil@in@{from}{#1}%
+		\ifpgfutil@in@%
+			\pgffor@var@count#1\pgffor@stop%
+		\else%
+			\pgffor@var@count#1 from 1\pgffor@stop%
+		\fi%
+}
+
+\def\pgffor@var@add#1#2\pgffor@stop{%
+	\ifx\pgffor@var\pgfutil@empty%
+		\def\pgffor@var{#1}%
+		\let\pgffor@var@first=\pgffor@var%
+		\def\pgffor@var@first@string{\string#1}%
+		\expandafter\def\expandafter\pgffor@var@first@string\expandafter{\expandafter\string\pgffor@var@first}%
+		\expandafter\let\csname pgffor@var@count@\pgffor@var@first@string\endcsname=\relax%
+	\else%
+		\expandafter\def\expandafter\pgffor@var\expandafter{\pgffor@var/#1}%
+	\fi%	
+	\expandafter\let\csname pgffor@var@evaluate@\string#1@as\endcsname=\relax%
+	\expandafter\let\csname pgffor@var@evaluate@\string#1@using\endcsname=\relax%
+}
+
+\def\pgffor@var@count#1#2from #3\pgffor@stop{%
+	\expandafter\def\csname pgffor@var@count@\pgffor@var@first@string\endcsname{#1}%
+	\def#1{#3}%
+}	
+
+\def\pgffor@var@evaluate#1#2\pgffor@@stop{%
+	\pgfutil@in@{as}{#2}%
+	\ifpgfutil@in@%
+		\pgffor@var@@evaluate#1#2\pgffor@@stop%
+	\else%
+		\pgffor@var@@evaluate#1 as #1#2\pgffor@@stop%
+	\fi%
+}	
+
+
+\def\pgffor@var@@evaluate#1#2as #3#4\pgffor@@stop{%
+	\expandafter\def\csname pgffor@var@evaluate@\string#1@as\endcsname{#3}%
+	\expandafter\let\csname pgffor@var@remember@\string#1@as\endcsname=\relax%
+	\expandafter\let\csname pgffor@var@evaluate\string#1@using\endcsname=\relax%
+	\pgfutil@in@{using}{#4}%
+	\ifpgfutil@in@%
+		\pgffor@var@@@evaluate{#1}#4\pgffor@@stop%
+	\fi%
+}
+\def\pgffor@var@@@evaluate#1#2using#3\pgffor@@stop{%
+	\expandafter\def\csname pgffor@var@evaluate@\string#1@using\endcsname{#3}%
+}
+
+\def\pgffor@var@remember#1#2as #3#4(initially #5)#6\pgffor@@stop{%
+	\expandafter\def\csname pgffor@var@remember@\string#1@as\endcsname{#3}%
+	\def#3{#5}}
+
+\def\pgffor@foreach{%
+	\begingroup%
+	\let\pgffor@var=\pgfutil@empty%
+	\let\pgffor@var@first=\pgfutil@empty%
+	\pgffor@vars
+}
+
+\let\foreach=\pgffor@foreach
+
+\def\pgffor@vars{%
+	\pgfutil@ifnextchar i{\pgffor@@vars@end}{%
+		\pgfutil@ifnextchar[{\pgffor@@vars@opt}{%]
+			\pgfutil@ifnextchar/{\pgffor@@vars@slash@gobble}{%	
+				\pgffor@@vars}}}}%
+
+\def\pgffor@@vars@end in{\pgfutil@ifnextchar\bgroup{\pgffor@normal@list}{\pgffor@macro@list}}
+\def\pgffor@@vars@opt[#1]{\pgfkeys{/pgf/foreach/.cd,#1}\pgffor@vars}
+\def\pgffor@@vars#1{\pgffor@var@add#1\pgffor@stop\pgffor@vars}
+\def\pgffor@@vars@slash@gobble/{\pgffor@@vars}
+
+\def\pgffor@macro@list#1{%
+  \expandafter\pgffor@normal@list\expandafter{#1}}
+\def\pgffor@normal@list#1{%
+  \def\pgffor@values{#1, \pgffor@stop,}%
+  \ifx\pgffor@values\pgffor@emptyvalues
+    \def\pgffor@values{\pgffor@stop,}%
+  \fi%
+  \let\pgffor@body\pgfutil@empty%
+  \global\pgffor@continuetrue%
+  \pgffor@collectbody}
+
+\def\pgffor@collectbody{%
+  \pgfutil@ifnextchar\foreach{\pgffor@collectforeach}{%
+    \pgfutil@ifnextchar\bgroup{\pgffor@collectargument}{\pgffor@collectsemicolon}}%
+}
+
+\def\pgffor@collectforeach\foreach#1in{%
+  \pgfutil@ifnextchar\bgroup{\pgffor@collectforeach@normal{#1}}{\pgffor@collectforeach@macro{#1}}}
+\def\pgffor@collectforeach@macro#1#2{%
+  \expandafter\long\expandafter\def\expandafter\pgffor@body\expandafter{\pgffor@body\foreach#1in#2}%
+  \pgffor@collectbody%
+}
+\def\pgffor@collectforeach@normal#1#2{%
+  \expandafter\long\expandafter\def\expandafter\pgffor@body\expandafter{\pgffor@body\foreach#1in{#2}}%
+  \pgffor@collectbody%
+}
+
+\long\def\pgffor@collectargument#1{%
+  \expandafter\long\expandafter\def\expandafter\pgffor@body\expandafter{\pgffor@body{#1}}%
+  \pgffor@iterate%
+}
+
+\def\pgffor@collectsemicolon{%
+  \let\pgffor@next=\pgffor@collectnormalsemicolon%
+  \ifnum\the\catcode`\;=\active\relax%
+    \let\pgffor@next=\pgffor@collectactivesemicolon%
+  \fi%
+  \pgffor@next%
+}
+
+\def\pgffor@collectnormalsemicolon#1;{%
+  \expandafter\long\expandafter\def\expandafter\pgffor@body\expandafter{\pgffor@body#1;}%
+  \pgffor@iterate%
+}
+
+{
+  \catcode`\;=\active
+  
+  \gdef\pgffor@collectactivesemicolon#1;{%
+    \expandafter\long\expandafter\def\expandafter\pgffor@body\expandafter{\pgffor@body#1;}%
+    \pgffor@iterate%
+  }
+}
+
+\def\pgffor@iterate{%
+  \let\pgffor@last=\pgfutil@empty%
+  \let\pgffor@prevlast=\pgfutil@empty%
+  \expandafter\pgffor@scan\pgffor@values}%
+
+\def\pgffor@stop{\pgffor@stop}%
+\def\pgffor@@stop{pgffor@@stop}%
+\def\pgffor@dots{...}%
+
+\def\pgffor@scan{\pgfutil@ifnextchar({\pgffor@scanround}{\pgffor@scanone}}
+\def\pgffor@scanround(#1)#2,{\def\pgffor@value{(#1)#2}\pgffor@scanned}
+\def\pgffor@scanone#1,{\def\pgffor@value{#1}\pgffor@scanned}
+
+\def\pgffor@scanned{%
+  \ifx\pgffor@value\pgffor@stop%
+    \let\pgffor@next=\pgffor@after% done!
+  \else%
+    \expandafter\pgfutil@in@\expandafter%
+    	{\expandafter.\expandafter.\expandafter.\expandafter}\expandafter{\pgffor@value}%
+    \ifpgfutil@in@%
+      \let\pgffor@next=\pgffor@handledots%
+    \else%
+      \let\pgffor@next=\pgffor@handlevalue%
+    \fi%
+    \ifpgffor@continue%
+    \else%
+      \let\pgffor@next=\pgffor@scan% done!
+    \fi%
+  \fi%
+  \pgffor@next}
+
+\def\pgffor@after{%
+  \global\pgffor@continuetrue%
+  \endgroup%
+  \pgffor@afterhook}
+
+\def\pgffor@handlevalue{%
+  \let\pgffor@prevlast\pgffor@last%
+  \let\pgffor@last\pgffor@value%
+  \pgffor@invokebody%
+  \pgffor@scan%
+}
+
+\def\pgffor@count@increment{%
+	\pgfutil@ifundefined{pgffor@var@count@\pgffor@var@first@string}{}%
+	{%
+		\expandafter\expandafter\expandafter\pgfutil@tempcnta\expandafter\expandafter\expandafter=%
+			\csname pgffor@var@count@\pgffor@var@first@string\endcsname\relax%
+		\advance\pgfutil@tempcnta by1\relax%
+		\expandafter\expandafter\expandafter\edef%
+			\csname pgffor@var@count@\pgffor@var@first@string\endcsname{\the\pgfutil@tempcnta}%
+	}%
+}
+
+\def\pgffor@invokebody{%
+	\let\pgffor@remembered@vars=\pgfutil@empty%
+  \begingroup%
+  	\let\pgffor@@remembered@vars=\pgfutil@empty%
+    \expandafter\pgfutil@in@\expandafter/\expandafter{\pgffor@var}%
+    \ifpgfutil@in@%
+      \expandafter\def\expandafter\pgffor@valuerest\expandafter{\pgffor@value//\relax}%
+      \expandafter\pgffor@multiassign\pgffor@var/\pgffor@stop/\pgffor@stop/\relax%
+    \else%
+    	\expandafter\expandafter\expandafter\def\expandafter\pgffor@var\expandafter{\pgffor@value}%
+    	%
+    	% Check for parsing.
+    	%
+    	\expandafter\def\expandafter\pgffor@var@string\expandafter{\expandafter\string\pgffor@var}%
+    	\pgfutil@ifundefined{pgffor@var@evaluate@\pgffor@var@string @as}{}%
+    	{%
+    		\pgfutil@ifundefined{pgffor@var@evaluate@\pgffor@var@string @using}%
+    		{%
+    			\pgfmathparse{\pgffor@value}%
+    		}%
+    		{%
+    			\expandafter\let\pgffor@var=\pgffor@value%
+		  		\pgfmathparse{\csname pgffor@var@evaluate@\pgffor@var@string @using\endcsname}%
+		  	}%
+    		\expandafter\expandafter\expandafter\let%
+					\csname pgffor@var@evaluate@\pgffor@var@string @as\endcsname=\pgfmathresult%
+    	}%
+    	\pgfutil@ifundefined{pgffor@var@remember@\pgffor@var@string @as}{}{\pgffor@remember\pgffor@var}%
+    \fi%
+    \let\pgffor@@remembered@vars=\pgffor@remembered@vars%
+    \expandafter\pgffor@beginhook\pgffor@body\pgffor@endhook%
+    \global\let\pgffor@remembered@vars=\pgffor@@remembered@vars%
+  \endgroup%
+  \ifx\pgffor@remembered@vars\pgfutil@empty%
+  \else%
+  	\pgffor@remembered@vars%
+  \fi%
+  \pgffor@count@increment%
+}
+
+\def\pgffor@remember#1{%
+ 	\edef\pgffor@remember@temp{%
+ 		\noexpand\def\expandafter\expandafter\expandafter%
+ 			\noexpand\csname pgffor@var@remember@\pgffor@var@string @as\endcsname{#1}}%
+ 	\expandafter\pgfutil@g@addto@macro\expandafter\pgffor@remembered@vars\expandafter{\pgffor@remember@temp}%
+}
+
+\def\pgffor@multiassign#1/#2/\relax{%
+  \def\pgffor@currentvar{#1}%
+  \def\pgffor@rest{#2}%
+  \ifx\pgffor@currentvar\pgffor@stop%
+    \let\pgffor@next=\relax%
+  \else%
+    \let\pgffor@next=\pgffor@multiassignrest%
+  \fi%
+  \pgffor@next%
+}
+
+\def\pgffor@multiassignrest{\expandafter\pgffor@multiassignfinal\pgffor@valuerest}
+
+\def\pgffor@multiassignfinal#1/#2/\relax{%
+  \def\pgffor@test{#2}%
+  \ifx\pgffor@test\pgfutil@empty%
+    \def\pgffor@valuerest{#1//\relax}% repeat
+  \else%
+    \def\pgffor@valuerest{#2/\relax}%
+  \fi%
+  \expandafter\def\expandafter\pgffor@var@string\expandafter{\expandafter\string\pgffor@currentvar}%
+  \pgfutil@ifundefined{pgffor@var@evaluate@\pgffor@var@string @as}{\expandafter\def\pgffor@currentvar{#1}}%
+  {%
+		\pgfutil@ifundefined{pgffor@var@evaluate@\pgffor@var@string @using}%
+		{%
+			\pgfmathparse{#1}%
+		}%
+		{%
+			\expandafter\def\pgffor@currentvar{#1}%
+  		\pgfmathparse{\csname pgffor@var@evaluate@\pgffor@var@string @using\endcsname}%
+  	}%
+		\expandafter\expandafter\expandafter\let%
+			\csname pgffor@var@evaluate@\pgffor@var@string @as\endcsname=\pgfmathresult%
+	}%
+	\pgfutil@ifundefined{pgffor@var@remember@\pgffor@var@string @as}{}{\pgffor@remember\pgffor@currentvar}%
+	\expandafter\pgffor@multiassign\pgffor@rest/\relax%
+}
+
+\def\pgffor@handledots{%
+  \ifx\pgffor@last\pgfutil@empty%
+    \PackageError{pgffor}{``...'' not allowed without prior value}{}%
+  \fi%
+  \expandafter\pgffor@@handledots\pgffor@value\pgffor@@stop%
+}
+
+\def\pgffor@@handledots#1...#2\pgffor@@stop{%
+	\def\pgffor@dots@pre{#1}%
+	\def\pgffor@dots@post{#2}%
+	\def\pgffor@dots@strip#1##1#2\pgffor@@stop{\def\pgffor@dotsvalue{##1}}%
+	\ifx\pgffor@dots@pre\pgfutil@empty%
+		\ifx\pgffor@dots@post\pgfutil@empty%
+			\def\pgffor@dots@strip##1\pgffor@@stop{\def\pgffor@dotsvalue{##1}}%
+		\fi%
+	\fi%
+	\pgfutil@ifnextchar x{\pgffor@dotsscanend}{\pgffor@dotsscanend}%
+}
+
+\def\pgffor@dotsscanend#1,{%
+  \pgffor@dots@strip#1\pgffor@@stop%
+  \expandafter\def\expandafter\pgffor@var@string\expandafter{\expandafter\string\pgffor@var@first}%
+  \pgfutil@ifundefined{pgffor@var@evaluate@\pgffor@var@string @as}%
+  {% No parsing, but check for characters...
+  	\expandafter\pgffor@dotscharcheck\pgffor@dotsvalue\pgffor@@stop%
+  	\let\pgffor@dotsend=\pgffor@dotsvalue% 
+		\expandafter\pgffor@dots@strip\pgffor@last\pgffor@@stop% 
+		\expandafter\pgffor@dotscharcheck\pgffor@dotsvalue\pgffor@@stop%
+		\let\pgffor@dotslast=\pgffor@dotsvalue%
+		\ifx\pgffor@prevlast\pgfutil@empty%
+	  	\ifdim\pgffor@dotsend pt>\pgffor@dotslast pt%
+	  		\pgffor@skip=1pt%
+	    \else%
+	      \pgffor@skip=-1pt%
+	    \fi%
+	  \else%
+	  	\expandafter\pgffor@dots@strip\pgffor@prevlast\pgffor@@stop% 
+	  	\expandafter\pgffor@dotscharcheck\pgffor@dotsvalue\pgffor@@stop%
+			\let\pgffor@dotsprevlast=\pgffor@dotsvalue%
+			%
+			\pgffor@skip=\pgffor@dotslast pt%
+	    \pgffor@iter=\pgffor@dotsprevlast pt%  
+	    \advance\pgffor@skip by-\pgffor@iter%
+	  \fi%
+  }%
+  {% ...everything parsed here.
+  	\pgfmathparse{\pgffor@dotsvalue}%
+		\let\pgffor@dotsend=\pgfmathresult%
+		\expandafter\pgffor@dots@strip\pgffor@last\pgffor@@stop%
+		\pgfmathparse{\pgffor@dotsvalue}%
+		\let\pgffor@dotslast=\pgfmathresult%
+		\ifx\pgffor@prevlast\pgfutil@empty%
+	  	\ifdim\pgffor@dotsend pt>\pgffor@dotslast pt%
+	  		\pgffor@skip=1pt%
+	    \else%
+	      \pgffor@skip=-1pt%
+	    \fi%
+	  \else%
+	  	\expandafter\pgffor@dots@strip\pgffor@prevlast\pgffor@@stop%
+	  	\pgfmathparse{\pgffor@dotsvalue}%
+			\let\pgffor@dotsprevlast=\pgfmathresult%
+			%
+			\pgffor@skip=\pgffor@dotslast pt%
+	    \pgffor@iter=\pgffor@dotsprevlast pt%  
+	    \advance\pgffor@skip by-\pgffor@iter%
+		\fi%
+  }%
+	%
+  \pgffor@iter=\pgffor@dotslast pt%
+  % do loop
+  \pgffor@loop%
+}
+
+\newif\ifpgffor@charuppercase
+\newif\ifpgffor@charlowercase
+
+
+
+\def\pgffor@gobbletil@pgffor@@stop#1\pgffor@@stop{}
+
+\def\pgffor@ifitemregister#1{%
+	\def\pgffor@item{#1}%
+	\begingroup%
+		\setbox0=\hbox\bgroup\pgfutil@selectfont%
+			\afterassignment\pgffor@@ifitemregister%
+			\noexpand#1=0.0pt\let\pgffor@temp=\relax\relax\pgffor@@stop}
+			
+\def\pgffor@@ifitemregister#1#2\pgffor@@stop{%
+		\egroup%
+	\endgroup%
+	\ifx#1.% A count.
+		\edef\pgffor@dotsvalue{\the\pgffor@item}%
+		\let\pgffor@dotsnext=\pgfutil@firstoftwo%
+	\else%
+		\ifx#1\let% A dimension or skip.
+			\edef\pgffor@dotsvalue{\pgfmath@tonumber{\pgffor@item}}%
+			\let\pgffor@dotsnext=\pgfutil@firstoftwo%
+		\else%
+			\let\pgffor@dotsnext=\pgfutil@secondoftwo%
+		\fi%
+	\fi%
+	\pgffor@dotsnext%
+}	
+	
+\def\pgffor@dotscharcheck#1\pgffor@@stop{%
+  \edef\pgffor@dotscharcheck@temp{#1}%
+  \expandafter\pgffor@@dotscharcheck\pgffor@dotscharcheck@temp\pgffor@@stop%
+}
+\def\pgffor@@dotscharcheck#1#2\pgffor@@stop{%
+  \pgffor@charuppercasefalse%
+  \pgffor@charlowercasefalse%
+  \pgffor@ifitemregister{#1}{}%
+  {%
+  	\afterassignment\pgffor@gobbletil@pgffor@@stop%	
+	  \expandafter\chardef\expandafter\pgffor@char\expandafter=\expandafter`#1\relax\pgffor@@stop%
+    \edef\pgffor@char{\the\pgffor@char}%
+    \ifnum\pgffor@char>64\relax% From A-Z?
+	    \ifnum\pgffor@char<91\relax%
+	      \let\pgffor@dotsvalue=\pgffor@char%
+	      \pgffor@charuppercasetrue%			
+	    \else%
+	      \ifnum\pgffor@char>96\relax% From a-z?
+	        \ifnum\pgffor@char<123\relax%
+	          \let\pgffor@dotsvalue=\pgffor@char%
+	          \pgffor@charlowercasetrue%
+	        \fi%
+	      \fi%
+	    \fi%
+	  \fi%
+	}%
+}
+
+\def\pgffor@Alpha#1{%
+	\ifcase#1\or A\or B\or C\or D\or E\or F\or G\or H\or I\or J\or K\or L\or M%
+	\or N\or O\or P\or Q\or R\or S\or T\or U\or V\or W\or X\or Y\or Z\else?\fi%
+}
+
+\def\pgffor@alpha#1{%
+	\ifcase#1\or a\or b\or c\or d\or e\or f\or g\or h\or i\or j\or k\or l\or m%
+	\or n\or o\or p\or q\or r\or s\or t\or u\or v\or w\or x\or y\or z\else?\fi%
+}
+
+\def\pgffor@loop{%
+  \advance\pgffor@iter by\pgffor@skip%
+  \let\pgffor@next=\pgffor@doloop%
+  \ifdim\pgffor@skip<0pt%
+    \ifdim\pgffor@iter<\pgffor@dotsend pt%
+      \let\pgffor@next=\pgffor@endloop%
+    \fi%
+  \else%
+    \ifdim\pgffor@iter>\pgffor@dotsend pt%
+      \let\pgffor@next=\pgffor@endloop%
+    \fi%
+  \fi%
+  \ifpgffor@continue%
+  \else%
+    \let\pgffor@next=\pgffor@endloop% done!
+  \fi%
+  \pgffor@next%
+}
+
+\def\pgffor@endloop{%
+  \pgffor@scan%
+}
+
+{\catcode`\p=12\catcode`\t=12\gdef\Pgffor@geT#1pt{#1}}
+
+\def\pgffor@doloop{%
+	\global\let\pgffor@remembered@vars=\pgfutil@empty%
+	\begingroup%
+		\let\pgffor@@remembered@vars=\pgfutil@empty%
+    \edef\pgffor@temp{\expandafter\Pgffor@geT\the\pgffor@iter}%
+    \edef\pgffor@incheck{{.0/}{\pgffor@temp/}}%
+    \expandafter\pgfutil@in@\pgffor@incheck%
+    \ifpgfutil@in@%
+      \expandafter\pgffor@strip\pgffor@temp%
+    \fi%  	
+   	\ifpgffor@charuppercase%
+  		\pgfutil@tempcnta=\pgffor@temp\relax%
+  		\advance\pgfutil@tempcnta by-64\relax%
+  		\edef\pgffor@temp{\pgffor@Alpha{\pgfutil@tempcnta}}%
+  	\else%
+  		\ifpgffor@charlowercase%
+  			\pgfutil@tempcnta=\pgffor@temp\relax%
+  			\advance\pgfutil@tempcnta by-96\relax%
+  			\edef\pgffor@temp{\pgffor@alpha{\pgfutil@tempcnta}}%
+  		\fi%
+  	\fi%		
+  	% Cannot use \edef as pre or post may conatain characters like ^. Sigh...
+  	\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\def%
+  		\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\pgffor@temp%
+  			\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter\expandafter%
+  				{\expandafter\expandafter\expandafter\pgffor@dots@pre\expandafter\pgffor@temp\pgffor@dots@post}%
+    \expandafter\pgfutil@in@\expandafter/\expandafter{\pgffor@var}%
+    \ifpgfutil@in@%
+      \expandafter\def\expandafter\pgffor@valuerest\expandafter{\pgffor@temp//\relax}%
+      \expandafter\pgffor@multiassign\pgffor@var/\pgffor@stop/\pgffor@stop/\relax%
+    \else%
+    	\expandafter\expandafter\expandafter\def\expandafter\pgffor@var\expandafter{\pgffor@temp}%
+    	% Check for parsing.
+    	\expandafter\def\expandafter\pgffor@var@string\expandafter{\expandafter\string\pgffor@var}%
+    	\pgfutil@ifundefined{pgffor@var@evaluate@\pgffor@var@string @as}{}%
+    	{%
+    		\pgfutil@ifundefined{pgffor@var@evaluate@\pgffor@var@string @using}%
+    		{%
+    			\pgfmathparse{\pgffor@temp}%
+    		}%
+    		{%
+		  		\pgfmathparse{\csname pgffor@var@evaluate@\pgffor@var@string @using\endcsname}%
+		  	}%
+    		\expandafter\expandafter\expandafter\let%
+					\csname pgffor@var@evaluate@\pgffor@var@string @as\endcsname=\pgfmathresult%
+    	}%
+    	\pgfutil@ifundefined{pgffor@var@remember@\pgffor@var@string @as}{}{\pgffor@remember\pgffor@var}%
+    \fi%
+    \let\pgffor@@remembered@vars=\pgffor@remembered@vars%
+    \expandafter\pgffor@beginhook\pgffor@body\pgffor@endhook%
+   	\global\let\pgffor@remembered@vars=\pgffor@@remembered@vars%
+  \endgroup%
+  \ifx\pgffor@remembered@vars\pgfutil@empty%
+  \else%
+  	\pgffor@remembered@vars%
+  \fi%
+  \pgffor@count@increment%
+  \pgffor@loop%  
+}
+
+\def\pgffor@strip#1.0{\def\pgffor@temp{#1}}
+
+\def\breakforeach{\global\pgffor@continuefalse}
+
+\endinput
