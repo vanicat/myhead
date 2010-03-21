@@ -5,6 +5,9 @@
 \ProvidesPackage{myhead}
          [2007/03/08 v0.1 common stuff for me]
 \RequirePackage[frenchb]{babel}
+\RequirePackage{pgf}
+\RequirePackage{tikz}
+\usetikzlibrary{arrows}
 \RequirePackage{fancyhdr}
 \RequirePackage{lastpage}
 \RequirePackage[T1]{fontenc}
@@ -123,10 +126,9 @@
 \newcommand{\vj}{\vect{j}}
 \newcommand{\Oij}{$(O,\vi,\vj)$}
 
-
 \newenvironment{myeqn}{\par\(\begin{array}{r@{\displaystyle}c@{\displaystyle}l@{\displaystyle}}}{\end{array}\)\par}
-\ProcessOptions\relax
 
+\ProcessOptions\relax
 
 \endinput
 

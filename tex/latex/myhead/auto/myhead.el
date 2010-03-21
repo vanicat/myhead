@@ -66,6 +66,8 @@
      "T1"
      "lastpage"
      "fancyhdr"
+     "tikz"
+     "pgf"
      "babel"
      "frenchb")))
 
