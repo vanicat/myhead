@@ -44,6 +44,7 @@
      "sline"
      "vu"
      "vv"
+     "vw"
      "vi"
      "vj"
      "Oij"
