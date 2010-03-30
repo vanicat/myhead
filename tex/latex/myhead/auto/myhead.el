@@ -46,7 +46,9 @@
      "vv"
      "vi"
      "vj"
+     "vk"
      "Oij"
+     "Oijk"
      "im")
     (TeX-run-style-hooks
      "comment"
