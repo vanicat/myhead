@@ -7,7 +7,7 @@
 %
 % See the file doc/generic/pgf/licenses/LICENSE for more details.
 
-\ProvidesPackageRCS[v\pgfversion] $Header: /cvsroot/pgf/pgf/generic/pgf/frontendlayer/tikz/tikz.code.tex,v 1.65 2009/12/29 20:24:41 ludewich Exp $
+\ProvidesPackageRCS[v\pgfversion] $Header: /cvsroot/pgf/pgf/generic/pgf/frontendlayer/tikz/tikz.code.tex,v 1.72 2010/08/25 06:40:10 ludewich Exp $
 
 
 % Always-present libraries:
@@ -67,6 +67,11 @@
 \tikzoption{baseline}[0pt]{\pgfutil@ifnextchar({\tikz@baseline@coordinate}{\tikz@baseline@simple}#1\@nil}%)
 \def\tikz@baseline@simple#1\@nil{\pgfsetbaseline{#1}}
 \def\tikz@baseline@coordinate#1\@nil{\pgfsetbaselinepointlater{\tikz@scan@one@point\pgfutil@firstofone#1}}
+
+\tikzoption{trim left}[0pt]{\pgfutil@ifnextchar({\tikz@trim@coordinate{left}}{\tikz@trim@simple{left}}#1\@nil}%)
+\tikzoption{trim right}{\pgfutil@ifnextchar({\tikz@trim@coordinate{right}}{\tikz@trim@simple{right}}#1\@nil}%)
+\def\tikz@trim@simple#1#2\@nil{\csname pgfsettrim#1\endcsname{#2}}
+\def\tikz@trim@coordinate#1#2\@nil{\csname pgfsettrim#1pointlater\endcsname{\tikz@scan@one@point\pgfutil@firstofone#2}}
 
 % Draw options
 \tikzoption{line width}{\tikz@semiaddlinewidth{#1}}%
@@ -466,7 +471,7 @@
   }%
 }
 
-\def\tikz@parse@pin[#1]#2:#3\pgf@nil{%
+\long\def\tikz@parse@pin[#1]#2:#3\pgf@nil{%
   \def\tikz@temp{#3}%
   \ifx\tikz@temp\pgfutil@empty%
     % no position, use default
@@ -476,7 +481,7 @@
   \fi%
 }
 
-\def\tikz@@parse@pin[#1]#2:#3:\pgf@nil{%
+\long\def\tikz@@parse@pin[#1]#2:#3:\pgf@nil{%
   \tikzset{append after command={%
     \bgroup
       [current point is local=true]
@@ -1274,9 +1279,13 @@
 \def\endtikzpicture{%
     \tikz@atend@picture%
     \global\let\pgf@shift@baseline=\pgf@baseline%
+    \global\let\pgf@trimleft@final=\pgf@trimleft%
+    \global\let\pgf@trimright@final=\pgf@trimright%
     \global\let\pgf@remember@smuggle=\ifpgfrememberpicturepositiononpage%
     \endscope%
     \let\pgf@baseline=\pgf@shift@baseline%
+    \let\pgf@trimleft=\pgf@trimleft@final%
+    \let\pgf@trimright=\pgf@trimright@final%
     \let\ifpgfrememberpicturepositiononpage=\pgf@remember@smuggle%
   \endpgfpicture}
   
@@ -1307,6 +1316,12 @@
   \catcode`\;=\active
   \gdef\tikz@collectactivesemicolon#1;{#1;\endtikzpicture}
 }
+
+% Invokes '#1' if the command is invoked withing a tikzpicture and
+% '#2' if not.
+\def\tikzifinpicture#1#2{%
+	\pgfutil@ifundefined{filldraw}{#2}{#1}%
+}%
 
 
 
@@ -2996,7 +3011,8 @@
 \def\tikz@fig@scan@name(#1){%
 	\pgfkeysvalueof{/tikz/name/.@cmd}#1\pgfeov% CF : this is now ALWAYS consistent with 'name=' option; allows overrides.
 	\tikz@@scan@fig}%
-\def\tikz@fig@scan@options[#1]{\tikzset{#1}\tikz@@scan@fig}%
+% make it \long to allow \par in "pin" options etc:
+\long\def\tikz@fig@scan@options[#1]{\tikzset{#1}\tikz@@scan@fig}%
 \let\tikz@node@reset@hook=\pgfutil@empty%
 \let\tikz@node@begin@hook=\pgfutil@empty%
 \def\tikz@fig@main{\afterassignment\tikz@@fig@main\let\next=}
@@ -3030,7 +3046,7 @@
           \else%
             \begingroup%
             	\pgfmathsetlength{\pgf@x}{\tikz@text@width}%
-              \pgfutil@minipage[t]{\pgf@x}%
+              \pgfutil@minipage[t]{\pgf@x}\leavevmode\hbox{}%
                 \tikz@text@action%
           \fi%
           \tikz@atbegin@node%
@@ -3337,7 +3353,7 @@
           \else%
             \begingroup%
             	\pgfmathsetlength{\pgf@x}{\tikz@text@width}%
-              \pgfutil@minipage[t]{\pgf@x}%
+              \pgfutil@minipage[t]{\pgf@x}\leavevmode\hbox{}%
                 \tikz@text@action%
           \fi%
           \bgroup%
@@ -4275,7 +4291,6 @@
 } 
 
 
-
 % Loading further libraries
 
 % Include a library file.
@@ -4301,16 +4316,20 @@
 \def\use@@tikzlibrary#1{%
   \edef\pgf@list{#1}%
   \pgfutil@for\pgf@temp:=\pgf@list\do{%
-    \expandafter\ifx\csname tikz@library@\pgf@temp @loaded\endcsname\relax%
-      \expandafter\global\expandafter\let\csname tikz@library@\pgf@temp @loaded\endcsname=\pgfutil@empty%
-      \expandafter\edef\csname tikz@library@#1@atcode\endcsname{\the\catcode`\@}
-      \expandafter\edef\csname tikz@library@#1@barcode\endcsname{\the\catcode`\|}
-      \catcode`\@=11
-      \catcode`\|=12
-      \input tikzlibrary\pgf@temp.code.tex
-      \catcode`\@=\csname tikz@library@#1@atcode\endcsname
-      \catcode`\|=\csname tikz@library@#1@barcode\endcsname
-    \fi%
+	\expandafter\pgfkeys@spdef\expandafter\pgf@temp\expandafter{\pgf@temp}%
+	\ifx\pgf@temp\pgfutil@empty
+	\else
+		\expandafter\ifx\csname tikz@library@\pgf@temp @loaded\endcsname\relax%
+		  \expandafter\global\expandafter\let\csname tikz@library@\pgf@temp @loaded\endcsname=\pgfutil@empty%
+		  \expandafter\edef\csname tikz@library@#1@atcode\endcsname{\the\catcode`\@}
+		  \expandafter\edef\csname tikz@library@#1@barcode\endcsname{\the\catcode`\|}
+		  \catcode`\@=11
+		  \catcode`\|=12
+		  \input tikzlibrary\pgf@temp.code.tex
+		  \catcode`\@=\csname tikz@library@#1@atcode\endcsname
+		  \catcode`\|=\csname tikz@library@#1@barcode\endcsname
+		\fi%
+	\fi
   }%
 }
 

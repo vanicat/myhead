@@ -7,7 +7,7 @@
 %
 % See the file doc/generic/pgf/licenses/LICENSE for more details.
 
-\ProvidesFileRCS $Header: /cvsroot/pgf/pgf/generic/pgf/basiclayer/pgfcorescopes.code.tex,v 1.28 2009/03/22 10:56:32 tantau Exp $
+\ProvidesFileRCS $Header: /cvsroot/pgf/pgf/generic/pgf/basiclayer/pgfcorescopes.code.tex,v 1.33 2010/08/26 10:06:52 ludewich Exp $
 
 % Globals
 
@@ -192,6 +192,13 @@
 
 \newif\ifpgfpicture
 
+\def\pgfresetboundingbox{%
+    \global\pgf@picmaxx=-16000pt\relax%
+    \global\pgf@picminx=16000pt\relax%
+    \global\pgf@picmaxy=-16000pt\relax%
+    \global\pgf@picminy=16000pt\relax%
+}%
+
 \def\pgfpicture{%
   \begingroup%
     \pgfpicturetrue%
@@ -249,7 +256,21 @@
               % Shift baseline outside:
               \pgf@relevantforpicturesizefalse%
               \pgf@process{\pgf@baseline}%
-              \gdef\pgf@shift@baseline{\the\pgf@y}%
+              \xdef\pgf@shift@baseline{\the\pgf@y}%
+			  %
+              \pgf@process{\pgf@trimleft}%
+              \global\advance\pgf@x by-\pgf@picminx
+			  % prepare \hskip\pgf@trimleft@final.
+              % note that \pgf@trimleft@final is also queried
+              % by the pgf image externalization.
+              \xdef\pgf@trimleft@final{-\the\pgf@x}%
+			  %
+              \pgf@process{\pgf@trimright}%
+              \global\advance\pgf@x by-\pgf@picmaxx
+			  % prepare \hskip\pgf@trimright@final.
+              % note that \pgf@trimright@final is also queried
+              % by the pgf image externalization.
+              \xdef\pgf@trimright@final{\the\pgf@x}%
             \endgroup%
             \hss%
           \egroup%
@@ -320,6 +341,7 @@
   \pgfsetbaselinepointlater{\pgf@setter@baseline}%
 }
 
+\def\pgf@default@text{default}%
 
 % Sets the baseline
 %
@@ -331,11 +353,65 @@
 % Example:
 %
 % \pgfsetbaseline{1cm+2pt}
+% \pgfsetbaseline{default}% resets to default value
 
-\def\pgfsetbaseline#1{\pgfsetbaselinepointlater{\pgfpoint{0pt}{#1}}}
+\def\pgfsetbaseline#1{%
+	\def\pgf@temp{#1}%
+	\ifx\pgf@temp\pgf@default@text
+		\pgfsetbaseline{\pgf@picminy}%
+	\else
+		\pgfsetbaselinepointlater{\pgfpoint{0pt}{#1}}%
+	\fi
+}
 \pgfsetbaseline{\pgf@picminy}
 
+% controls how the image externalization implements trim:
+\newif\ifpgf@trim@lowlevel
+\pgfkeys{
+	/pgf/trim lowlevel/.is if=pgf@trim@lowlevel,
+	/pgf/trim lowlevel/.default=true,
+}
 
+% Same as the y-baseline for horizontal alignment.
+% The effect is different, though: it is some kind of trimming which
+% leaves the bounding box intact.
+\def\pgfsettrimleftpointlater#1{\def\pgf@trimleft{#1}}
+\def\pgfsettrimleftpointnow#1{%
+  \pgf@process{#1}%
+  \edef\pgf@setter@baseline{\noexpand\pgfpoint{\the\pgf@x}{\the\pgf@y}}%
+  \pgfsettrimleftpointlater{\pgf@setter@baseline}%
+}
+% \pgfsettrimleft{<x coord>}
+% or
+% \pgfsettrimleft{default}
+\def\pgfsettrimleft#1{%
+	\def\pgf@temp{#1}%
+	\ifx\pgf@temp\pgf@default@text
+		\pgfsettrimleft{\pgf@picminx}
+	\else
+		\pgfsettrimleftpointlater{\pgfpoint{#1}{0pt}}%
+	\fi
+}
+\pgfsettrimleft{\pgf@picminx}
+
+\def\pgfsettrimrightpointlater#1{\def\pgf@trimright{#1}}
+\def\pgfsettrimrightpointnow#1{%
+  \pgf@process{#1}%
+  \edef\pgf@setter@baseline{\noexpand\pgfpoint{\the\pgf@x}{\the\pgf@y}}%
+  \pgfsettrimrightpointlater{\pgf@setter@baseline}%
+}
+% \pgfsettrimright{<x coord>}
+% or
+% \pgfsettrimright{default}
+\def\pgfsettrimright#1{%
+	\def\pgf@temp{#1}%
+	\ifx\pgf@temp\pgf@default@text
+		\pgfsettrimright{\pgf@picmaxx}%
+	\else
+		\pgfsettrimrightpointlater{\pgfpoint{#1}{0pt}}%
+	\fi
+}
+\pgfsettrimright{\pgf@picmaxx}
 
 
 % Interrupt path

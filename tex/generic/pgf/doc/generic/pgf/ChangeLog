@@ -1,3 +1,171 @@
+2010-08-31 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- externalization+\ref: fixed a bug
+
+2010-08-30 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- external lib: documented how to generate .png graphics and added support
+	switches.
+
+2010-08-26 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- added 'baseline=default', 'trim left=default' and 'trim right=default' choices to reset these keys.
+
+2010-08-25 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- added support to provide paragraphs in "pin" arguments
+
+2010-08-24 Till Tantau <tantau@users.sourceforge.net>
+
+	- Worked on data visualization and its documentation.
+
+
+2010-08-23 Christian Feuersaenger <ludewich@users.sourceforge.net>
+	
+	- basic level externalization: added \hoffset=0pt and \voffset=0pt to improve
+	compatibility with special document classes
+	- added docs for \deferedanchor feature contributed by Christophe Jorssen <jorssen.leraincy@free.fr>
+	- ConTeXt support: fixed loading problem of calendar lib
+
+
+2010-08-18 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- pgfsys-tex4ht.def: fixed problem with \par in a non-long macro argument,
+	thereby eliminating a compilation problem
+	- pgfsys-tex4ht.def: renamed offending macro invocation \Par to \par
+
+
+2010-08-16 Christian Feuersaenger <ludewich@users.sourceforge.net>
+	
+	- basic level image externalization: added '/pgf/images/trim external={<left>}{<bottom>}{<right>}{<top>}'
+	to allow modifications to the hardcoded '1truein' shifts.
+	- added '/.style n args' key.
+	- \usetikzlibrary / \usepgflibrary: added support for white-space trimming
+	and empty arguments in the lists. Now, lines do not need to be terminated
+	by '%' and ',,' is valid.
+
+2010-08-13 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- external lib: documented how to solve compatibility problems with
+	\tikzifexternalizing
+
+2010-08-11 Christian Feuersaenger <ludewich@users.sourceforge.net>
+	
+	- added \deferedanchor feature contributed by Christophe Jorssen <jorssen.leraincy@free.fr>
+
+2010-08-03 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- added optimized and numerically stable arc path command
+	\pgfpatharctoprecomputed which interpolates start- and end points
+	
+2010-07-10 Christian Feuersaenger <ludewich@users.sourceforge.net>
+	
+	- external lib: fixed incompatibility with 2010/06/08 v2.0b eso-pic package 
+
+2010-07-06 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- external lib: added sanity checking for failed \ref,\pageref,\cite commands in external images.
+
+2010-07-01 Christian Feuersaenger <ludewich@users.sourceforge.net>
+	
+	- math parser: improved error messages by providing the complete math expression.
+
+2010-06-30 Christian Feuersaenger <ludewich@users.sourceforge.net>
+	
+	- added 'trim left' and 'trim right' features to simplify bounding box
+	modifications and allow support for restricted bounding boxes and image
+	externalization.	
+
+2010-06-16 Christian Feuersaenger <ludewich@users.sourceforge.net>
+	
+	- pgfutil-latex.def: changed \usepackage to \RequirePackage (thanks to Christophe Jorssen)
+	- external lib: added \tikzappendtofigurename{} shortcut for '\tikzset{external/figure name/.add={}{suffix}}'
+
+2010-06-14 Christian Feuersaenger <ludewich@users.sourceforge.net>
+	
+	- external lib: added warning at end of document if not all graphics have
+	been found.
+
+2010-06-10 Christian Feuersaenger <ludewich@users.sourceforge.net>
+	
+	- updated file 'tikzexternal.sty' for \label and \ref support inside of
+	externalized graphics
+	- documented how \label and \ref support in external graphics works.
+	- activated \label support for mode=convert with system call and
+	documented limitations.
+
+2010-06-09 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- added \tikzifinpicture{<true code>}{<false code>} macro
+
+2010-05-31 Till Tantau <tantau@users.sourceforge.net>
+
+	- Worked on data visualization.
+
+2010-05-30 Till Tantau <tantau@users.sourceforge.net>
+
+	- Added .list key handler.
+
+2010-05-26 Till Tantau <tantau@users.sourceforge.net>
+
+	- Worked on data visualization.
+	
+2010-05-06 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- improved sanity checking in number printer: now, the zero flag is
+	checked even if its exponent > 0
+
+2010-04-22 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- floatparsenumber: number format errors after exponents now contain the offending
+	character instead of '\relax' 
+
+2010-04-12 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- number printer: added 'frac denom' and 'frac whole' for fine tuning of
+	fractional number printing.
+
+2010-04-10 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- number printer: made \protect portable across TeX variants (doesn't
+	produce bugs with context anymore)
+	- fpu: optimized \pgfmathfloatgetflagstomacro
+
+2010-04-09 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- added \pgfresetboundingbox
+	- added \pgfgetlastxy coordinate macro
+	- added '/pgf/images/include external/<image name>' code key.
+
+2010-04-08 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- fpu: added convenience method \pgfmathfloattoint
+
+2010-03-31 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- number printer: added 'frac' style to automatically create fractionals.
+
+2010-03-25 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- splitted basic level file pgfcoreimage.code.tex: there is now a 
+	pgfcoreexternal.code.tex file.
+
+2010-03-24 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- \pgfmathprintnumber is no longer a "fragile" command (it is \protect'ed
+	automatically in LaTeX).
+
+2010-03-23 Till Tantau <tantau@users.sourceforge.net>
+
+	- Fixed baseline alignment with "text width" option in LaTeX.
+
+2010-03-23 Mark Wibrow <vibrovski@users.sourceforge.net>
+
+	- New divide function
+	- Rewrote code foreach extensions. Now no longer an impenetrable mess.
+	  pgffor.code.tex is much larger, but contains some (as yet) undocumented 
+	  features which may get optimised out.
+	
 2010-03-19 Christian Feuersaenger <ludewich@users.sourceforge.net>
 
 	- Image externalization: added '/pgf/images/aux in dpth' feature.

@@ -13,8 +13,8 @@ A first example:
 \begin{codeexample}[]
 \begin{tikzpicture}[baseline]
   \datavisualization [
-    school book plot,
-    smooth,
+    school book axes,
+    visualize as smooth line,
     clean ticks,
     all axes={grid={step=1,minor steps between steps=1}},
     x axis={
@@ -40,11 +40,11 @@ A first example:
 \begin{codeexample}[]
 \begin{tikzpicture}[baseline]
   \datavisualization [
-    scientific clear axes,
-    line plot,
+    scientific clean axes,
+    visualize as line,
     all axes={padding=4pt},
     x axis={logarithmic,
-      ticks={many,
+      ticks={many, tick unit={ms},
         node style={rotate=45,anchor=north east}},
       label={time},
       grid=many},
@@ -66,7 +66,7 @@ A first example:
     scientific inner axes,
     all axes={padding=4pt},
     euro about strategy,
-    scatter plot,
+    visualize as scatter,
     x axis={attribute=x2},
     y axis={attribute=y2}
   ]
