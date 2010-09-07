@@ -32,6 +32,7 @@
      "ovl"
      "vect"
      "R"
+     "Q"
      "N"
      "Z"
      "id"
