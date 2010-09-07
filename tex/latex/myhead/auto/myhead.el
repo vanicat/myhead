@@ -70,6 +70,7 @@
      "lastpage"
      "fancyhdr"
      "tikz"
+     "variations"
      "pgf"
      "babel"
      "frenchb")))
