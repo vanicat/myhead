@@ -4,17 +4,80 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{myhead}
          [2007/03/08 v0.1 common stuff for me]
-\RequirePackage[frenchb]{babel}
+\RequirePackage[francais]{babel}
 \RequirePackage{pgf}
 \RequirePackage{variations}
 \RequirePackage{tikz}
 \usetikzlibrary{arrows}
+\usetikzlibrary{calc}
 \RequirePackage{fancyhdr}
 \RequirePackage{lastpage}
+\RequirePackage[utf8]{inputenc}
 \RequirePackage[T1]{fontenc}
+\DeclareUnicodeCharacter{0391}{\ensuremath{\Alpha}}
+\DeclareUnicodeCharacter{03B1}{\ensuremath{\alpha}}
+\DeclareUnicodeCharacter{0392}{\ensuremath{\Beta}}
+\DeclareUnicodeCharacter{03B2}{\ensuremath{\beta}}
+\DeclareUnicodeCharacter{0393}{\ensuremath{\Gamma}}
+\DeclareUnicodeCharacter{03B3}{\ensuremath{\gamma}}
+\DeclareUnicodeCharacter{0394}{\ensuremath{\Delta}}
+\DeclareUnicodeCharacter{03B4}{\ensuremath{\delta}}
+\DeclareUnicodeCharacter{0395}{\ensuremath{\Epsilon}}
+\DeclareUnicodeCharacter{03B5}{\ensuremath{\epsilon}}
+\DeclareUnicodeCharacter{0396}{\ensuremath{\Zeta}}
+\DeclareUnicodeCharacter{03B6}{\ensuremath{\zeta}}
+\DeclareUnicodeCharacter{0397}{\ensuremath{\Eta}}
+\DeclareUnicodeCharacter{03B7}{\ensuremath{\eta}}
+\DeclareUnicodeCharacter{0398}{\ensuremath{\Theta}}
+\DeclareUnicodeCharacter{03B8}{\ensuremath{\theta}}
+\DeclareUnicodeCharacter{0399}{\ensuremath{\Iota}}
+\DeclareUnicodeCharacter{03B9}{\ensuremath{\iota}}
+\DeclareUnicodeCharacter{039A}{\ensuremath{\Kappa}}
+\DeclareUnicodeCharacter{03BA}{\ensuremath{\kappa}}
+\DeclareUnicodeCharacter{039B}{\ensuremath{\Lambda}}
+\DeclareUnicodeCharacter{03BB}{\ensuremath{\lambda}}
+\DeclareUnicodeCharacter{039C}{\ensuremath{\Mu}}
+\DeclareUnicodeCharacter{03BC}{\ensuremath{\mu}}
+\DeclareUnicodeCharacter{039D}{\ensuremath{\Nu}}
+\DeclareUnicodeCharacter{03BD}{\ensuremath{\nu}}
+\DeclareUnicodeCharacter{039E}{\ensuremath{\Xi}}
+\DeclareUnicodeCharacter{03BE}{\ensuremath{\xi}}
+\DeclareUnicodeCharacter{039F}{\ensuremath{\Omicron}}
+\DeclareUnicodeCharacter{03BF}{\ensuremath{\omicron}}
+\DeclareUnicodeCharacter{03A0}{\ensuremath{\Pi}}
+\DeclareUnicodeCharacter{03C0}{\ensuremath{\pi}}
+\DeclareUnicodeCharacter{03A1}{\ensuremath{\Rho}}
+\DeclareUnicodeCharacter{03C1}{\ensuremath{\rho}}
+\DeclareUnicodeCharacter{03A3}{\ensuremath{\Sigma}}
+\DeclareUnicodeCharacter{03C3}{\ensuremath{\sigma}}
+\DeclareUnicodeCharacter{03A4}{\ensuremath{\Tau}}
+\DeclareUnicodeCharacter{03C4}{\ensuremath{\tau}}
+\DeclareUnicodeCharacter{03A5}{\ensuremath{\Upsilon}}
+\DeclareUnicodeCharacter{03C5}{\ensuremath{\upsilon}}
+\DeclareUnicodeCharacter{03A6}{\ensuremath{\Phi}}
+\DeclareUnicodeCharacter{03C6}{\ensuremath{\varphi}}
+\DeclareUnicodeCharacter{03A7}{\ensuremath{\Chi}}
+\DeclareUnicodeCharacter{03C7}{\ensuremath{\chi}}
+\DeclareUnicodeCharacter{03A8}{\ensuremath{\Psi}}
+\DeclareUnicodeCharacter{03C8}{\ensuremath{\psi}}
+\DeclareUnicodeCharacter{03A9}{\ensuremath{\Omega}}
+\DeclareUnicodeCharacter{03C9}{\ensuremath{\omega}}
+\DeclareUnicodeCharacter{00A0}{~}
+\DeclareUnicodeCharacter{00AC}{\ensuremath{\neg}}
+\DeclareUnicodeCharacter{00B1}{\ensuremath{\pm}}
+\DeclareUnicodeCharacter{00D7}{\ensuremath{\times}}
+\DeclareUnicodeCharacter{00F7}{\ensuremath{\div}}
+\DeclareUnicodeCharacter{2026}{\ldots}
+\DeclareUnicodeCharacter{207A}{\ensuremath{^{+}}}
+\DeclareUnicodeCharacter{207B}{\ensuremath{^{-}}}
+\DeclareUnicodeCharacter{2020}{\ensuremath{\dagger}}
+\DeclareUnicodeCharacter{2021}{\ensuremath{\ddagger}}
+\DeclareUnicodeCharacter{2212}{\ensuremath{-}}
+\DeclareUnicodeCharacter{2260}{\ensuremath{\neq}}
+\DeclareUnicodeCharacter{00B2}{\ensuremath{^{2}}}
+
 \RequirePackage{amsfonts}
 \RequirePackage{amstext}
-\RequirePackage[utf8x]{inputenc}
 \RequirePackage{amsthm}
 \RequirePackage{amssymb}
 \RequirePackage{amsmath}
@@ -39,6 +102,7 @@
 \fancyhead[R]{\thepage/\pageref{LastPage}} %
 \fancyfoot[C]{\empty}}
 
+\newcommand{\nohead}{\geometry{margin=30pt} \pagestyle{empty}}
 
 \newtheoremstyle{myexo}{6pt}{12pt}{}{}{\bf}{}{\newline}{%
   \thmname{#1} \thmnumber{#2}\makeatletter \@ifempty{#3}{.}{~: \thmnote{#3}.}}
@@ -88,14 +152,22 @@
 \newcommand{\dinf}{\displaystyle \inf}
 \newcommand{\udl}{\underline}
 \newcommand{\ovl}{\overline}
-\newcommand{\vect}{\overrightarrow}
+\ifx\vect\undefined
+  \newcommand{\vect}{\overrightarrow}
+\fi
 \newcommand{\vectr}[1]{\vect{\mathrm{#1}}}
+\newcommand{\vcoord}[2]{\left(
+    \begin{array}{cc}
+      #1 \\ #2
+    \end{array}\right)
+}
 \newcommand{\CM}[1][2\pi]{\mathop{\rm CM}_{#1}}
 %\newcommand{\C}{{\Bbb C}}
-\newcommand{\R}{{\Bbb R}}
-\newcommand{\Q}{{\Bbb Q}}
-\newcommand{\N}{{\Bbb N}}
-\newcommand{\Z}{{\Bbb Z}}
+
+\def\R{\mathbb{R}}
+\def\Q{{\Bbb Q}}
+\def\N{{\Bbb N}}
+\def\Z{{\Bbb Z}}
 \newcommand{\id}{\mathop{\rm id}\nolimits}
 \newcommand{\sh}{\mathop{\rm sh}\nolimits}
 \newcommand{\ch}{\mathop{\rm ch}\nolimits}
