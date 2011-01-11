@@ -2,9 +2,22 @@
  (lambda ()
     (LaTeX-add-environments
      "Exo"
+     "Sol"
+     "Exem"
+     "Exems"
      "Theo"
+     "Cor"
      "Def"
+     "Meth"
      "Prop"
+     "Lem"
+     "Rap"
+     "Rem"
+     "Rems"
+     "Voc"
+     "Not"
+     "Appl"
+     "Appls"
      "Preuve"
      "myeqn")
     (TeX-add-symbols
