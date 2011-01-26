@@ -4,6 +4,7 @@
      "Exo"
      "Theo"
      "Def"
+     "Defs"
      "Prop"
      "Preuve"
      "myeqn")
@@ -47,6 +48,7 @@
      "vi"
      "vj"
      "vk"
+     "vO"
      "Oij"
      "Oijk"
      "im"
