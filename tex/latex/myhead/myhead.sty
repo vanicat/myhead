@@ -10,6 +10,7 @@
 \RequirePackage{tikz}
 \usetikzlibrary{arrows}
 \usetikzlibrary{calc}
+\usetikzlibrary{through}
 \RequirePackage{fancyhdr}
 \RequirePackage{lastpage}
 \RequirePackage[utf8]{inputenc}
@@ -75,6 +76,8 @@
 \DeclareUnicodeCharacter{2212}{\ensuremath{-}}
 \DeclareUnicodeCharacter{2260}{\ensuremath{\neq}}
 \DeclareUnicodeCharacter{00B2}{\ensuremath{^{2}}}
+\DeclareUnicodeCharacter{00B3}{\ensuremath{^{3}}}
+\DeclareUnicodeCharacter{2074}{\ensuremath{^{4}}}
 \DeclareUnicodeCharacter{2264}{\ensuremath{\leq}}
 \DeclareUnicodeCharacter{2265}{\ensuremath{\geq}}
 \DeclareUnicodeCharacter{20AC}{\euro}
@@ -140,7 +143,8 @@
 \newtheorem*{Rems}{Remarques}
 \newtheorem*{Voc}{Vocabulaire}
 \newtheorem*{Not}{Notation}
-
+\newtheorem*{Appl}{Application}
+\newtheorem*{Appls}{Applications}
 
 \def\im{\qopname\relax o{im}}
 \newcommand{\pa}[1]{\left(#1\right)}
@@ -214,6 +218,11 @@
 \newcommand{\Oijk}{$(O,\vi,\vj,\vk$}
 
 \newenvironment{myeqn}{\par\(\begin{array}{r@{\displaystyle}c@{\displaystyle}l@{\displaystyle}}}{\end{array}\)\par}
+
+\newcommand{\framesecsub}{\frametitle{\textbf{\thesection)  \insertsection} \\
+    \hspace*{1.5em}\thesubsection) \insertsubsection}}
+\newcommand{\framesec}{\frametitle{\textbf{\thesection ) \insertsection}}}
+\newcommand{\framesub}{\frametitle{\hspace*{1.5em}\thesubsection) \insertsubsection}}
 
 \ProcessOptions\relax
 
