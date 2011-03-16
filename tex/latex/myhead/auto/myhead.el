@@ -35,6 +35,8 @@
      '("set" 1)
      '("pa" 1)
      '("header" 1)
+     '("languagepath" 1)
+     '("uselanguage" 1)
      "nohead"
      "ExoName"
      "dsum"
