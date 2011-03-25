@@ -1,3 +1,159 @@
+2011-03-22 Till Tantau <tantau@users.sourceforge.net>
+
+	- Finished documentation of data visualization (sort of)! 
+	- First usable version of data visualization!
+
+2011-03-15 Till Tantau <tantau@users.sourceforge.net>
+
+	- Worked on dv documentation. Finished chapter on visualizers,
+	style sheets. Legends still missing
+
+2011-03-07 Till Tantau <tantau@users.sourceforge.net>
+
+	- Worked on dv documentation. Finished chapter on axes.
+
+2011-03-07  Christian Feuersaenger <ludewich@users.sourceforge.net>
+	
+	- Incorporated a bugfix of Hans Hagen which makes pgf compatible with
+	Context Mk IV.
+	Verified: the patch is backwards compatible with TL 2009 and TL 2010
+	i.e. Context MkII and it works with Context Mk IV.
+
+2011-01-22 Till Tantau <tantau@users.sourceforge.net>
+
+	- Worked on dv documentation.
+	
+2011-01-05  Christophe Jorssen <cjorssen@users.sourceforge.net>
+
+	- Attempt to fix a bug #1911195 with pgfpages and rotation (fix
+	contributed by Mark Wibrow). Note: Mark was not sure it has side
+	effects.
+
+2010-12-17  Christophe Jorssen <cjorssen@users.sourceforge.net>
+
+	- Documentation will now compile with auto-xref enabled (a problem
+	with \_ in the graph lib not handled correctly by
+	pgfmanual.pdflinks.code.tex).
+	- Fix bug #3104978 thanks to Heiko Oberdiek patch on ctt.
+
+2010-12-17 Till Tantau <tantau@users.sourceforge.net>
+
+	- Changed the graph syntax for anonymous nodes in the graph
+	library and simplified the as= syntax.
+	- Added fresh nodes options to graph library.
+
+2010-12-14 Till Tantau <tantau@users.sourceforge.net>
+
+	- Fixed graph lib so that it compiles with plain TeX.
+
+2010-12-10 Till Tantau <tantau@users.sourceforge.net>
+
+	- Small fixed in the graph library.
+
+2010-12-07 Till Tantau <tantau@users.sourceforge.net>
+
+	- Finished graph library!
+
+2010-12-06 Till Tantau <tantau@users.sourceforge.net>
+
+	- Nearly finished graph lib and its documentation.
+
+2010-11-30 Till Tantau <tantau@users.sourceforge.net>
+
+	- Fixed bug #3123605 (hopefully...).
+	- Worked on graph lib.
+
+2010-11-19  Christophe Jorssen <cjorssen@users.sourceforge.net>
+
+	- Some integer arithmetics functions for the math parser
+	(contributed by Alain Matthes): gcd, isprime, isodd, iseven
+
+2010-11-19 Till Tantau <tantau@users.sourceforge.net>
+
+	- Second attempt at making \tikz work also with fragile stuff
+	following. The new code will no longer fail in a situation
+	like \tikz \foreach ...
+	- Worked on graph lib stuff.
+
+2010-11-06  Christophe Jorssen <cjorssen@users.sourceforge.net>
+
+	- A luatex version of the doc is available (fixed inputenc issues
+	since luatex works with utf8 by default).
+
+2010-11-04  Christophe Jorssen <cjorssen@users.sourceforge.net>
+
+	- Fix bug in pgfmathfunctions.basic.code.tex (bug reported by
+	Alain Matthes and fixed by Paul Gaborit on fctt): wrong
+	interaction between pow and exp (linked to \pgfmath@x modified
+	outside macro call).
+
+2010-11-01  Christophe Jorssen <cjorssen@users.sourceforge.net>
+
+	- Make \pgfkeys@exp@call long (bug reported by Florent Chervet on
+	fctt)
+	- Fix bug in pgflibraryshapes.callouts.code.tex: \pgf@test changed
+	to \pgf@node@name (bug reported by Zarko F. Cucej on ctt and fix
+	contributed by Mark Wibrow)
+	
+2010-10-27  Christophe Jorssen <cjorssen@users.sourceforge.net>
+
+	- fixed bug 3096333 (Fix contributed by Mark Wibrow): pgffor
+	failed to update \lastx in some cases 
+	
+2010-10-25  Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	Released version 2.10
+
+2010-10-22 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- closed a lot of bugs on sourceforge, especially documentation bugs
+	- fixed bug 2429749: gnuplot invocation in tabularx did not work.
+
+2010-10-21 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- fixed bug: there was an incompatibility between pgf and beamer due to a
+	missing \interlineskip in the shipout handling for latex.
+
+2010-10-15 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- renamed 'halfcircle' marker to 'halfcircle*' and added 'halfcircle'.
+	- provided special case 'mark color=none' for the half-filled markers.
+
+2010-10-13 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- fixed incorrect fill/stroke coloring of new marker contributions (see
+	ChangeLog 2010-09-27)
+	- added more predefined dashed and dotted line patterns for black/white plots
+	to fulfill a related feature request of Tomek
+	- fixed bug: the 'name path global' feature did not work in every case...
+	the actual implementation might need to be revised eventually.
+
+2010-10-12 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- Imported spell checking results of Stefan Pinnow (thanks!)
+	- Dealed with typo in 'sci generic' number formatting style: it now
+	accepts 'mantissa' *and* 'mantisse'
+
+2010-10-11 Christian Feuersaenger <ludewich@users.sourceforge.net>
+	
+	- External lib: Fixed bug. The 'failed ref warnings for' was not properly \protect'ed.
+
+2010-09-27 Till Tantau <tantua@users.sourceforge.net>
+
+	- Started on graph lib. Not yet finished and not documented.
+	
+
+2010-09-21 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- Added plot markers of Magnus Tewes and Tomek: halfcircle, halfsquare*,
+	halfsquare left*, halfsquare right*, heart
+
+2010-09-08 Till Tantau <tantua@users.sourceforge.net>
+
+	- Added \pgfpositionnodelater and \pgfpositionnodenow
+	commands.
+	
+
 2010-08-31 Christian Feuersaenger <ludewich@users.sourceforge.net>
 
 	- externalization+\ref: fixed a bug
@@ -24,7 +180,7 @@
 	
 	- basic level externalization: added \hoffset=0pt and \voffset=0pt to improve
 	compatibility with special document classes
-	- added docs for \deferedanchor feature contributed by Christophe Jorssen <jorssen.leraincy@free.fr>
+	- added docs for \deferredanchor feature contributed by Christophe Jorssen <cjorssen@users.sourceforge.net>
 	- ConTeXt support: fixed loading problem of calendar lib
 
 
@@ -51,7 +207,7 @@
 
 2010-08-11 Christian Feuersaenger <ludewich@users.sourceforge.net>
 	
-	- added \deferedanchor feature contributed by Christophe Jorssen <jorssen.leraincy@free.fr>
+	- added \deferredanchor feature contributed by Christophe Jorssen <cjorssen@users.sourceforge.net>
 
 2010-08-03 Christian Feuersaenger <ludewich@users.sourceforge.net>
 
@@ -2211,3 +2367,7 @@
 	- Added pgfshade.sty
 	
 
+
+;;; Local Variables:
+;;; coding: undecided-unix
+;;; End:

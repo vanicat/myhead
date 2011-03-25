@@ -31,6 +31,7 @@ dark yellow):
   \plotmarkentry{o}
   \plotmarkentry{asterisk}
   \plotmarkentry{star}
+  \plotmarkentry{10-pointed star}
   \plotmarkentry{oplus}
   \plotmarkentry{oplus*}
   \plotmarkentry{otimes}
@@ -41,11 +42,30 @@ dark yellow):
   \plotmarkentry{triangle*}
   \plotmarkentry{diamond}
   \plotmarkentry{diamond*}
+  \plotmarkentry{halfdiamond*}
+  \plotmarkentry{halfsquare*}
+  \plotmarkentry{halfsquare right*}
+  \plotmarkentry{halfsquare left*}
   \plotmarkentry{pentagon}
   \plotmarkentry{pentagon*}
+  \plotmarkentry{Mercedes star}
+  \plotmarkentry{Mercedes star flipped}
+  \plotmarkentry{halfcircle}
+  \plotmarkentry{halfcircle*}
+  \plotmarkentry{heart}
   \plotmarkentry{text}
 \end{tabular}
 }
+
+Note that each of the provided marks can be rotated freely by means of |mark options={rotate=90}| or |every mark/.append style={rotate=90}|.
+
+\begin{key}{/pgf/mark color=\marg{color} (initially empty)}
+	Defines the additional fill color for the |halfcircle|, |halfcircle*|, |halfdiamond*| and |halfsquare*| markers. An empty value uses |white| (which is the initial configuration). The special value |none| disables filling of the respective parts.
+
+	Note that |halfsquare| will be filled with |mark color|, and the starred variant |halfsquare*| will be filled half with |mark color| and half with the actual |fill| color.
+\end{key}
+
+
 
 {
 \def\showit#1{%
@@ -65,7 +85,7 @@ dark yellow):
 
 	If |/pgf/text mark as node=false| (the default), \marg{options} is provided as argument to |\pgftext| -- which provides only some basic keys like |left|, |right|, |top|, |bottom|, |base| and |rotate|.
 
-	If |/pgf/text mark as node=true|, \marg{options} is provided as argument to |\node|. This means you can provide a very powerful set of options including |anchor|, |scale|, |fill|, |draw|, |rounded corners| etc. 
+	If |/pgf/text mark as node=true|, \marg{options} is provided as argument to |\node|. This means you can provide a very powerful set of options including |anchor|, |scale|, |fill|, |draw|, |rounded corners| etc.
 \end{key}
 \begin{key}{/pgf/text mark as node=\mchoice{true,false} (initially false)}
 	Configures how |mark=text| will be drawn: either as |\node| or as |\pgftext|.
@@ -76,7 +96,7 @@ dark yellow):
 }
 
 
-%%% Local Variables: 
+%%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "pgfmanual-pdftex-version"
-%%% End: 
+%%% End:

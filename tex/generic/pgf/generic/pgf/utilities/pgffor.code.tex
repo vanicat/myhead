@@ -7,7 +7,7 @@
 %
 % See the file doc/generic/pgf/licenses/LICENSE for more details.
 
-\ProvidesPackageRCS[v\pgfversion] $Header: /cvsroot/pgf/pgf/generic/pgf/utilities/pgffor.code.tex,v 1.18 2010/03/23 14:47:45 vibrovski Exp $
+\ProvidesPackageRCS[v\pgfversion] $Header: /cvsroot/pgf/pgf/generic/pgf/utilities/pgffor.code.tex,v 1.20 2010/12/06 17:16:26 tantau Exp $
 
 
 \newdimen\pgffor@iter
@@ -133,14 +133,14 @@
 }  
 
 \def\pgffor@iterate{%
-	% Must do all of these in case the internal stack is used.
-	\let\pgffor@last=\pgfutil@empty%
+  % Must do all of these in case the internal stack is used.
+  \let\pgffor@last=\pgfutil@empty%
   \let\pgffor@prevlast=\pgfutil@empty%
   \let\pgffor@dotsend=\pgfutil@empty%
-	\let\pgffor@dots@pre=\pgfutil@empty%
-	\let\pgffor@dots@post=\pgfutil@empty%
-	%
-	\expandafter\pgffor@scan\pgffor@values}
+  \let\pgffor@dots@pre=\pgfutil@empty%
+  \let\pgffor@dots@post=\pgfutil@empty%
+  % 
+  \expandafter\pgffor@scan\pgffor@values}
 
 \def\pgffor@stop{\pgffor@stop}%
 \def\pgffor@dots{...}%
@@ -520,28 +520,32 @@
 \let\pgffor@remember@expanded=\pgfutil@empty
 
 \def\pgffor@default@endgroup{%
-		\ifx\pgffor@assign@once@code\pgfutil@empty%
-		\else%
-			\global\edef\pgffor@remember@once@expanded{\pgffor@remember@once@code}%
-  	\fi%
-		\ifx\pgffor@remember@code\pgfutil@empty%
-    \else%
-			\global\edef\pgffor@remember@expanded{\pgffor@remember@code}%
-		\fi%
-	\endgroup%
-	%
-	\ifx\pgffor@remember@once@expanded\pgfutil@empty%
-  \else%
-  	\pgffor@remember@once@expanded%
-  	\let\pgffor@assign@once@code=\pgfutil@empty%
-  	\global\let\pgffor@remember@once@expanded=\pgfutil@empty%
-  \fi%
-  %
-	\ifx\pgffor@remember@expanded\pgfutil@empty%
-  \else%
-  	\pgffor@remember@expanded%
-  	\global\let\pgffor@remember@expanded=\pgfutil@empty%
-  \fi%
+   \ifx\pgffor@remember@once@code\pgfutil@empty
+   \else
+     \xdef\pgffor@remember@once@expanded{\pgffor@remember@once@code}%
+   \fi
+   \ifx\pgffor@remember@code\pgfutil@empty
+   \else
+     \xdef\pgffor@remember@expanded{\pgffor@remember@code}%
+   \fi
+ \endgroup
+ %
+ \ifx\pgffor@remember@once@expanded\pgfutil@empty
+ \else
+   \pgffor@remember@once@expanded%
+   % \let\pgffor@assign@once@code=\pgfutil@empty % Not needed anymore? (CJ)
+   \global\let\pgffor@remember@once@expanded=\pgfutil@empty
+ \fi
+ \ifx\pgffor@assign@once@code\pgfutil@empty
+ \else
+   \global\let\pgffor@assign@once@code=\pgfutil@empty
+ \fi
+ %
+ \ifx\pgffor@remember@expanded\pgfutil@empty
+ \else
+   \pgffor@remember@expanded%
+   \global\let\pgffor@remember@expanded=\pgfutil@empty
+ \fi
 }
 
 \let\pgffor@begingroup=\pgffor@default@begingroup

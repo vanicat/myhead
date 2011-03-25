@@ -1,7 +1,7 @@
 rerun = "(There were undefined references|Rerun to get (cross-references|the bars) right)"
 doc   = pgfmanual
 latex = pdflatex
-TEXINPUTS := ../../text-en:$(TEXINPUTS)
+TEXINPUTS := ../../text-en:../../images:$(TEXINPUTS)
 
 all: $(doc).pdf
 
@@ -13,6 +13,7 @@ dist: FORCE
 	export TEXMFCNF="../../text-en:$(TEXMFCNF)"; \
 	export TEXINPUTS="$(TEXINPUTS)"; \
 	$(latex) '\def\pgfautoxrefs{1}\pdfminorversion=5 \pdfobjcompresslevel=2 \input{$(doc)}'
+	makeindex $(doc).idx
 	@echo "$(doc).pdf remade with auto-xref support. Check if auto-xrefs work and rerun make dist if not."
 
 pgfmanual.idx: 
@@ -29,4 +30,17 @@ pgfmanual.pdf: $(doc).tex $(doc).ind
 FORCE:
 
 clean:
-	rm -f pgfmanual*.aux pgfmanual.{out,log,idx,ind,ilg,pdf,toc,bbl,blg}
+	rm -f  \
+		plots/* \
+		pgfmanual.out \
+		pgfmanual.log \
+		pgfmanual.idx \
+		pgfmanual.ind \
+		pgfmanual.ilg \
+		pgfmanual.pdf \
+		pgfmanual.toc \
+		pgfmanual.bbl \
+		pgfmanual.blg \
+		pgfmanual.ps \
+		pgfmanual.dvi \
+		pgfmanual*.aux 
