@@ -92,6 +92,7 @@
      "utf8"
      "lastpage"
      "fancyhdr"
+     "graphicx"
      "tikz"
      "variations"
      "pgf"
