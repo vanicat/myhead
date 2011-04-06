@@ -37,6 +37,7 @@
      '("header" 1)
      '("languagepath" 1)
      '("uselanguage" 1)
+     "nomprenom"
      "nohead"
      "ExoName"
      "dsum"

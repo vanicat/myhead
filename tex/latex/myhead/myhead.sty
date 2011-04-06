@@ -8,6 +8,7 @@
 \RequirePackage{pgf}
 \RequirePackage{variations}
 \RequirePackage{tikz}
+\RequirePackage{graphicx}
 \usetikzlibrary{arrows}
 \usetikzlibrary{calc}
 \usetikzlibrary{through}
@@ -109,6 +110,7 @@
 \SIdecimalsign{,}
 \date{}
 
+
 \newcommand{\header}[1]{ %
 \geometry{margin=40pt,includehead}
 \pagestyle{fancy} %
@@ -116,6 +118,7 @@
 \fancyhead[C]{#1} %
 \fancyhead[R]{\thepage/\pageref{LastPage}} %
 \fancyfoot[C]{\empty}}
+\newcommand{\nomprenom}{\fancyhead[L]{Nom:\\Prénom:}}
 
 \newcommand{\nohead}{\geometry{margin=30pt} \pagestyle{empty}}
 
