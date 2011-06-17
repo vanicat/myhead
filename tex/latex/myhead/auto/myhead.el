@@ -70,6 +70,7 @@
      "framesecsub"
      "framesec"
      "framesub"
+     "EURbis"
      "im"
      "R"
      "Q"

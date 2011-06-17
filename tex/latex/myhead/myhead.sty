@@ -82,7 +82,7 @@
 \DeclareUnicodeCharacter{2074}{\ensuremath{^{4}}}
 \DeclareUnicodeCharacter{2264}{\ensuremath{\leq}}
 \DeclareUnicodeCharacter{2265}{\ensuremath{\geq}}
-\DeclareUnicodeCharacter{20AC}{\euro}
+\DeclareUnicodeCharacter{20AC}{\text{\euro}}
 \DeclareUnicodeCharacter{2197}{\ensuremath{\nearrow{}}}
 \DeclareUnicodeCharacter{2198}{\ensuremath{\searrow{}}}
 \DeclareUnicodeCharacter{2192}{\ensuremath{\rightarrow{}}}
@@ -96,6 +96,10 @@
 %\RequirePackage{pstricks}
 %\RequirePackage{pst-eucl}
 \RequirePackage{eurosym}
+
+\let\EURbis\EUR
+\renewcommand\EUR[1]{\text{\EURbis{\num{#1}}}}
+
 %\RequirePackage{mathabx}
 \RequirePackage{enumerate}
 \RequirePackage{multicol}
