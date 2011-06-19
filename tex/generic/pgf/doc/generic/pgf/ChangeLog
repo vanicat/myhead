@@ -1,3 +1,242 @@
+2011-06-02 Christophe Jorssen <cjorssen@users.sourceforge.net>
+
+	- Some work on a lua (lpeg based) math parser.
+
+2011-05-31 Christophe Jorssen <cjorssen@users.sourceforge.net>
+
+	- Added a gnuplot call key to pgfmoduleplot.code.tex (feature
+	request #3308340).
+
+2011-05-30 Jannis Pohlmann <jannis@xfce.org>
+
+	- graph drawing: 
+	  - Initial work on layered drawing algorithms.
+
+2011-05-25 Christophe Jorssen <cjorssen@users.sourceforge.net>
+
+	- Added dim function for array to pgfmath (to be documented)
+	- Some work on a ODE solver
+	
+2011-05-20 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- removed spurious white spaces in my bugfix for pgfmathdivide
+
+2011-05-19 Till Tantau <tantau@users.sourceforge.net>
+
+	- Second attempt at fixing spy lib...
+
+2011-05-18 Matthias Schulz <ma.schulz@email.de>
+
+	- graph drawing:
+	  - added short overview for nodes and edges (lua class documentation)
+
+2011-05-17 Jannis Pohlmann <jannis@xfce.org>
+
+	- graph drawing:
+	  - Separate 'spring layout' and 'spring electrical layout' families.
+		  Rename existing algorithms accordingly.
+	  - Add an implementation of the Floyd-Warshall algorithm.
+	  - Add a new 'Hu2006 spring' algorithm based solely on springs.
+	  - Improve the initial layout of 'Hu2006 spring electrical' by 
+	    taking the graph size and diameter into account.
+	  - Rework existing spring electrical algorithms and improve 
+	    documentation.
+	  - Catch -!- edges and remove them from the Lua graph when detected.
+
+2011-05-14 Jannis Pohlmann <jannis@xfce.org>
+
+	- graph drawing:
+	  - Update documentation of spring and spring-electrical parameters.
+	    Add TODO items where things are missing, unclear or need to be 
+	    worked on.
+	  - Make initial step dimension and the electric charge of nodes
+	    configurable. Both, Walshaw2000 and Hu2006 support this.
+	  - Improve the approximation of the repulsive force.
+
+2011-05-13 Till Tantau <tantau@users.sourceforge.net>
+
+	- Fixed bug 3297817 (spy postscript problem).
+	- Fixed bug of missing newpath in postscript and opacity
+	  settings. 
+	
+2011-05-13 Jannis Pohlmann <jannis@xfce.org>
+
+	- graph drawing:
+	  - Rename graphdrawing.spring to graphdrawing.force.
+	  - Fix NaN bug in the orientation helper.
+	  - Initial work on improving and documenting the parameters for
+	    spring and spring-electrical algorithms.
+	  - Properly forward default node and edge parameters to Lua.
+
+2011-05-12 Jannis Pohlmann <jannis@xfce.org>
+
+	- graph drawing:
+	  - Add Fibonacci heap and priority queue classes. 
+	  - Add Lua file for common graph algorithms. Implement Dijkstra.
+	  - Add method Graph:getPseudoDiameter().
+	  - Hu2006: Scale coordinations of nodes in a coarse graph based on 
+	    the quotient of its pseudo diameters and that of the parent coarse
+	    graph, as described in the paper.
+
+2011-05-11 Jannis Pohlmann <jannis@xfce.org>
+
+	- graph drawing:
+	  - Fix several interpolation bugs in the coarse graph class.
+	  - Use the coarse graph class in the Walshaw2000 algorithm.
+
+2011-05-11 Till Tantau <tantau@users.sourceforge.net>
+
+	- Worked on documentation of gd backend. Still need to
+	  document graph parameters.
+	
+2011-05-10 Jannis Pohlmann <jannis@xfce.org>
+
+	- graph drawing:
+	  - Remove files from the old graph drawing library tree.
+	  - Disable verbose logging by default.
+	  - Specify sane initial values for spring algorithm parameters.
+
+2011-05-10 Till Tantau <tantau@users.sourceforge.net>
+
+	- Added .graph drawing parameter initial key.
+
+2011-05-09 Jannis Pohlmann <jannis@xfce.org>
+
+	- graph drawing:
+	  - Implement graph coarsening in the Hu2006 algorithm.
+	  - Name force-based algorithms after the paper author and year.
+
+2011-05-09 Till Tantau <tantau@users.sourceforge.net>
+
+	- Reorganized graph drawing documentation.
+
+2011-05-06 Jannis Pohlmann <jannis@xfce.org>
+
+	- Finished the graph drawing library reorganization started by Till.
+
+2011-05-06 Till Tantau <tantau@users.sourceforge.net>
+
+	- Reorganized the graph drawing key and directory
+	  structure. The documentation is still missing. Also, lots of
+	  files still need to be moved, but I'll leave that to Jannis.
+	
+2011-05-06 Jannis Pohlmann <jannis@xfce.org>
+
+	- graph drawing:
+	  - implement a quadtree optimization in the Walshaw algorithm.
+	  - add a simple version of the Hu spring-electrical algorithm that
+	    seems to work almost as good as the Walshaw even without
+		  the multilevel approach implemented (which is the only thing
+		  that really makes the Walshaw algorithm useful).
+
+2011-05-04 Jannis Pohlmann <jannis@xfce.org>
+
+	- graph drawing: 
+	  - Initial work on a quad tree implementation for spring and spring
+		  electrical algorithms, with unit test.
+		- Improve the internals of the Vector class.
+
+2011-05-03 Till Tantau <tantau@users.sourceforge.net>
+
+	- graph drawing: Started to cleanup pgf and tikz layers. Ongoing...
+
+2011-05-03 Jannis Pohlmann <jannis@xfce.org>
+
+	- graph drawing:
+		- Fix Walshaw algorithm to properly set the subnodes when copying
+		  the coarse graphs. Simplify the code that updates the node
+		  coordinates.
+
+2011-05-02 Jannis Pohlmann <jannis@xfce.org>
+
+	- graph drawing:
+	  - Modify the doclet to allow underscores in parameter names.
+		- Document the Vector class as well as the table, iter and traversal
+		  helpers.
+		- Remove old table and iterator helpers. Rename helper files. Rename
+		  table.merge() and table.copy() to table.custom_merge() and
+		  table.custom_copy() to avoid name clashes with luatools. Add 
+		  string helpers, including string.parse_braces(). Update algorithms 
+		  to work with these changes.
+		- Allow vectors to have an origin vector, similar to the Position
+		  class. Introduce new alternative table-based syntax for
+		  Vector:set() that is much easier to read. Update unit tests
+		  and algorithms. 
+
+2011-05-02 Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- fpu: added support for log10 and log2
+
+2011-05-02 Jannis Pohlmann <jannis@xfce.org>
+
+	- graph drawing: 
+	  - Drop the 'not yet positionedPGFGDINTERNAL' node name prefix
+	    internally. It's stripped off now when nodes are passed over to
+	  	Lua and its added back again when shipping the node out to TeX.
+	  -	Drop the Node:shortname() method which is no longer needed.
+	  - Improve coding style and documentation of the Interface, Sys, 
+	    Node, Edge and Graph classes. 
+	  - Rename Sys:logMessage() to Sys:log().
+	  - Make parameter labels in the API docs not appear in bold.
+		- Disable verbose logging by default.
+		- Add methods Edge:getNodes() and Node:getEdges().
+
+2011-05-02 Jannis Pohlmann <jannis@xfce.org>
+
+	- graph drawing: 
+	  - Initial work on spring-electrical and layered drawing algorithms.
+		- Major rework of the Lua code of the graphdrawing library: added
+		  a Vector class for improved math operations and node positioning,
+			added quite a number of table and iterator helpers, added
+			post-processing code for fixing the orientation of graph drawings,
+			updated the graph/node/edge data structures to store nodes in the order
+			they appear instead of storing them in a random order, implement
+			coordinate keys for nodes, and much more.
+
+2011-04-30  Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- number printing: added '1000 sep in fractionals' switch
+
+2011-04-29 Christophe Jorssen <cjorssen@users.sourceforge.net>
+
+	- Work on pgflibraryluamath (added pgfpointnormalised)
+
+2011-04-27 Matthias Schulz <ma.schulz@email.de>
+
+	- Graphdrawing library documentation, split into two files, removed
+	noluatex file, reworked the text (added information).
+
+2011-04-25 Christophe Jorssen <cjorssen@users.sourceforge.net>
+
+	- First attempt to do math with lua (very basical): pgflibraryluamath
+
+2011-04-18  Christian Feuersaenger <ludewich@users.sourceforge.net>
+
+	- bugfix for rounding error in \pgfmathdivide{83.407811000}{16.68156400}
+	was 4.10, is now 5.0: it could happen in rare cases that digits where 
+	appended where they shouldhave been than added (4 + .10 instead of 4 + 1.0)
+
+2011-04-22 Jannis Pohlmann <jannis@xfce.org>
+
+	- Implemented a G_n subgraph for creating grid (or: mesh) graphs.
+	This also introduces a new key /tikz/graphs/wrap after=<number> that
+	configures how the nodes in such a grid graph are connected. Some of
+	the common subgraph keys such as /tikz/graphs/V and /tikz/graphs/n 
+	can be used with G_n subgraphs as well.
+	- Added a simple grid placement strategy. It currently does not 
+	support the chain shift and group shift keys properly and does not 
+	implement any placement order other than left-to-right, so there is
+	room for improvement.
+
+2011-04-18  Christian Feuersaenger <ludewich@users.sourceforge.net>
+	
+	- external lib: reduced number of \newwrite allocations and allowed to disable features
+	to safe more of them (aux in dpth=false,disable dependency files)
+
+2011-04-17  Christian Feuersaenger <ludewich@users.sourceforge.net>
+	
+	- added '/pgf/number format/relative' formatting style.
+
 2011-03-22 Till Tantau <tantau@users.sourceforge.net>
 
 	- Finished documentation of data visualization (sort of)! 

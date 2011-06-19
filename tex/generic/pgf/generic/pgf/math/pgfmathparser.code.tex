@@ -12,14 +12,15 @@
 \def\pgfmathprint#1{\pgfmathparse{#1}\pgfmathresult}
 
 \def\pgfmathparse{%
-	\begingroup%
-		\pgfmath@catcodes%
-		\pgfmath@quickparsefalse%
-		\ifpgfmathfloat%
-			\let\pgfmath@parse@next=\pgfmathfloatparsenumber%
-		\else%
-			\let\pgfmath@parse@next=\pgfmathparse@%
-		\fi%
+	\begingroup
+		\pgfmath@catcodes
+		\pgfmath@quickparsefalse
+    % Test for the fpu library
+		\ifpgfmathfloat
+			\let\pgfmath@parse@next=\pgfmathfloatparsenumber
+		\else
+			\let\pgfmath@parse@next=\pgfmathparse@
+		\fi
 		\pgfmath@parse@next}
 
 \def\pgfmath@catcodes{% Maybe unecessary.
@@ -30,60 +31,66 @@
 }
 
 \def\pgfmathqparse{%
-	\begingroup%
-		\pgfmath@catcodes%
-		\pgfmath@quickparsetrue%
+	\begingroup
+		\pgfmath@catcodes
+		\pgfmath@quickparsetrue
 		\pgfmathparse@}
 	
 \def\pgfmathparse@#1{%
+    % We are inside a group (opened in |\pgfmathparse| or
+    % |\pgfmathqparse|). 
 		% Stuff for calc compatiability.
-		\let\real=\pgfmath@calc@real%
-    \let\minof=\pgfmath@calc@minof%
-    \let\maxof=\pgfmath@calc@maxof%
-    \let\ratio=\pgfmath@calc@ratio%
-    \let\widthof=\pgfmath@calc@widthof%
-    \let\heightof=\pgfmath@calc@heightof%
-    \let\depthof=\pgfmath@calc@depthof%
-    % Restore font.
-    \pgfmath@selectfont%
+		\let\real=\pgfmath@calc@real
+    \let\minof=\pgfmath@calc@minof
+    \let\maxof=\pgfmath@calc@maxof
+    \let\ratio=\pgfmath@calc@ratio
+    \let\widthof=\pgfmath@calc@widthof
+    \let\heightof=\pgfmath@calc@heightof
+    \let\depthof=\pgfmath@calc@depthof
+    % Restore font (defined in pgfmathutil.code.tex)
+    \pgfmath@selectfont
     % Expand expression so any reamining CSs are registers
-    % or box dimensions (i.e., \wd, \ht, \dp).
+    % or box dimensions (i.e. |\wd|, |\ht|, |\dp|).
     \edef\pgfmath@expression{#1}%
     % No units yet. 
-    \global\pgfmathunitsdeclaredfalse%
+    \global\pgfmathunitsdeclaredfalse
     % Set up stack.
     \pgfmath@stack@operation={{}{}{}}%
 		\pgfmath@stack@operand={{}{}{}}%
-		\let\pgfmath@stack@operation@top=\pgfmath@stack@empty%
-		\let\pgfmath@stack@operand@top=\pgfmath@stack@empty%
+		\let\pgfmath@stack@operation@top=\pgfmath@stack@empty
+		\let\pgfmath@stack@operand@top=\pgfmath@stack@empty
 		% An expression always begins with an operand.
 		\expandafter\pgfmath@bgroup@strip\expandafter{\pgfmath@expression}%
+    % |\pgfmath@bgroup@stripped| is the result of
+    % |\pgfmath@bgroup@strip|
 		\expandafter\pgfmath@parse@@operand\pgfmath@bgroup@stripped @@@@\pgfmath@parse@stop%
-}%
+}
 
 \def\pgfmath@parse@end#1\pgfmath@parse@stop{%
-		\pgfmathpostparse%
+		\pgfmathpostparse
 		\pgfmath@smuggleone\pgfmathresult%
-	\endgroup%
-	\ignorespaces}%	
+	\endgroup
+	\ignorespaces}
 
-\let\pgfmathpostparse=\relax%
+\let\pgfmathpostparse=\relax
 
 % For compatiability with older version.
 %
 \def\pgfmathscaleresult{%
-	\ifpgfmathunitsdeclared%
-  \else%
-  	\ifpgfmathignoreunitscale%
-  	\else%
+	\ifpgfmathunitsdeclared
+  \else
+  	\ifpgfmathignoreunitscale
+  	\else
    	  \afterassignment\pgfmath@gobbletilpgfmath@%
       \pgfmath@x\pgfmathresultunitscale pt\relax\pgfmath@%
       \expandafter\pgfmath@x\pgfmathresult\pgfmath@x%
       \edef\pgfmathresult{\pgfmath@tonumber{\pgfmath@x}}%
-    \fi%
-  \fi%
+    \fi
+  \fi
 }
+
 \def\pgfmathsetresultunitscale#1{\def\pgfmathresultunitscale{#1}}
+
 \def\pgfmathresultunitscale{1}
 
 % Stuff for compatability with the calc package.
@@ -116,13 +123,19 @@
 \edef\pgfmath@char@hash{\the\pgfmath@toks}
 
 \def\pgfmath@tokens@make#1#2{%
+  % Defines for each token or balenced text in |#2| a control sequence
+  % |\pgfmath@token@<#1>@\string<one token from #2>| and stores |#2|
+  % in it.
 	\def\pgfmath@prefix{#1}%
+  % Note the empty group |{}| at the end that ends the loop in
+  % |\pgfmath@token@@make|.
 	\expandafter\pgfmath@tokens@@make#2{}}
 	
 \def\pgfmath@tokens@@make#1{%
 	\def\pgfmath@token{#1}%
-	\ifx\pgfmath@token\pgfmath@empty%
-	\else%
+	\ifx\pgfmath@token\pgfmath@empty
+    % End of loop: all tokens or balanced texts were parsed.
+	\else
 		\pgfmath@namedef{pgfmath@token@\pgfmath@prefix @\string#1}{#1}%
 		\expandafter\pgfmath@tokens@@make%
 	\fi}
@@ -145,18 +158,17 @@
 \pgfmath@namedef{pgfmath@base@0B}{2}
 
 % Determine if a register is a count or a dimension/skip register.
-%
 \newif\ifpgfmath@dimen@
 \def\pgfmath@dimen@#1{%
-	\begingroup%
+	\begingroup
 		\afterassignment\pgfmath@dimen@@%
 		#1=0.0pt\relax\pgfmath@}
 \def\pgfmath@dimen@@#1#2\pgfmath@{%
-	\endgroup%
+	\endgroup
 	\ifx#1.%
-		\pgfmath@dimen@false%
-	\else%
-		\pgfmath@dimen@true%
+		\pgfmath@dimen@false
+	\else
+		\pgfmath@dimen@true
 	\fi}
 
 \def\pgfmath@parse@ifbgroup#1#2{%
@@ -166,18 +178,22 @@
 	\pgfmath@parse@@ifbgroup}
 	
 \def\pgfmath@parse@@ifbgroup{%
-	\ifx\pgfmath@token@let\bgroup%
-		\let\pgfmath@parse@next=\pgfmath@parse@@@ifbgroup%
-	\else%
-		\ifx\pgfmath@token@let\pgfmath@sptoken%
-			\let\pgfmath@parse@next=\pgfmath@parse@@@@ifbgroup%
-		\else%
-			\let\pgfmath@parse@next=\pgfmath@parse@nobgroup@after%
-		\fi%
-	\fi%
+	\ifx\pgfmath@token@let\bgroup
+		\let\pgfmath@parse@next=\pgfmath@parse@@@ifbgroup
+	\else
+    % |\pgfmath@sptoken| defined in \file{pgfmathutil.code.tex}.
+		\ifx\pgfmath@token@let\pgfmath@sptoken
+			\let\pgfmath@parse@next=\pgfmath@parse@@@@ifbgroup
+		\else
+			\let\pgfmath@parse@next=\pgfmath@parse@nobgroup@after
+		\fi
+	\fi
 	\pgfmath@parse@next}
 
-\def\pgfmath@parse@@@ifbgroup#1{\pgfmath@parse@bgroup@after\pgfmath@bgroup#1\pgfmath@egroup}
+% I (CJ) *think* it replaces |{| and |}| by |\pgfmath@bgroup| and
+% |\pgfmath@egroup|?
+\def\pgfmath@parse@@@ifbgroup#1{%
+  \pgfmath@parse@bgroup@after\pgfmath@bgroup#1\pgfmath@egroup}
 
 {
 \def\:{\pgfmath@parse@@@@ifbgroup}
@@ -185,27 +201,42 @@
 }
 
 % Parse an operand.
-%	
-\def\pgfmath@parse@operand{\expandafter\pgfmath@parse@@operand\pgfmath@token@next}%
+\def\pgfmath@parse@operand{%
+  \expandafter\pgfmath@parse@@operand\pgfmath@token@next}
 
-\def\pgfmath@parse@@operand{\pgfmath@parse@ifbgroup{\pgfmath@parse@@operand}{\pgfmath@parse@@operand@}}
+% This is the entry point for the parser. It is called at the end of
+% |\pgfmathparse@| with the following syntax
+% |\expandafter\pgfmath@parse@@operand\pgfmath@bgroup@stripped
+% @@@@\pgfmath@parse@stop|.
+% Note: we are inside a group.
+\def\pgfmath@parse@@operand{%
+  \pgfmath@parse@ifbgroup{\pgfmath@parse@@operand}{\pgfmath@parse@@operand@}}
 
+% An operand is 
+% * |+| (unary plus),
+% * |-| (unary minus), 
+% * a prefix operator
 \def\pgfmath@parse@@operand@#1{%
 	\def\pgfmath@token{#1}%
-	\ifx\pgfmath@token\pgfmath@char@plus% Ignore.
+	\ifx\pgfmath@token\pgfmath@char@plus
+    % Unary (prefix) plus
 		\let\pgfmath@parse@next=\pgfmath@parse@@operand%
-	\else%
-		\ifx\pgfmath@token\pgfmath@char@minus%
-			\pgfmath@stack@push@operation{neg}% Unary minus.
-			\let\pgfmath@parse@next=\pgfmath@parse@@operand%
-		\else%
-			\expandafter\ifx\csname pgfmath@operation@\expandafter\string\pgfmath@token @prefix\endcsname\pgfmath@token%
-				\let\pgfmath@parse@next=\pgfmath@parse@prefix@operator%
-			\else%
-				\ifpgfmath@quickparse%
-					\let\pgfmath@parse@next=\pgfmath@qparse@operand%
-				\else%
-					\let\pgfmath@number=\pgfmath@empty%
+	\else
+		\ifx\pgfmath@token\pgfmath@char@minus
+      % Unary (prefix) minus
+			\pgfmath@stack@push@operation{neg}%
+			\let\pgfmath@parse@next=\pgfmath@parse@@operand
+		\else
+      % See |\pgfmathdeclareoperator| (below). Note that |+| and |-|
+      % that are also declared as operators have been tested before so
+      % they should never be parsed as binary (infix) operator at this stage.
+			\expandafter\ifx\csname pgfmath@operation@\expandafter\string\pgfmath@token @prefix\endcsname\pgfmath@token
+				\let\pgfmath@parse@next=\pgfmath@parse@prefix@operator
+			\else
+				\ifpgfmath@quickparse
+					\let\pgfmath@parse@next=\pgfmath@qparse@operand
+				\else
+					\let\pgfmath@number=\pgfmath@empty
 					\expandafter\ifx\csname pgfmath@token@functional@\string#1\endcsname\relax%
 						\let\pgfmath@base=\pgfmath@empty%
 						\let\pgfmath@token@next=\pgfmath@token%
@@ -649,12 +680,19 @@
 % the parser is not fully robust for arbitrary operators.
 %
 \def\pgfmathdeclareoperator#1#2#3#4#5{%
-	\pgfmath@namedef{pgfmath@operator@\string#1}{#1}%
-	\pgfmath@namedef{pgfmath@operation@\string#1@name}{#2}%
-	\pgfmath@namedef{pgfmath@operation@\string#1@arity}{#3}%
-	\pgfmath@namedef{pgfmath@operation@\string#1@#4}{#1}%
-	\pgfmath@namedef{pgfmath@operation@\string#1@precedence}{#5}%
+  \ifx\pgfmath@operatorlist\pgfutil@empty
+    \edef\pgfmath@operatorlist{{\string#1}}%
+  \else
+    \edef\pgfmath@operatorlist{\pgfmath@operatorlist,{\string#1}}%
+  \fi
+  \pgfmath@namedef{pgfmath@operator@\string#1}{#1}%
+  \pgfmath@namedef{pgfmath@operation@\string#1@name}{#2}%
+  \pgfmath@namedef{pgfmath@operation@\string#1@arity}{#3}%
+  \pgfmath@namedef{pgfmath@operation@\string#1@#4}{#1}%
+  \pgfmath@namedef{pgfmath@operation@\string#1@precedence}{#5}%
 }
+
+\def\pgfmath@operatorlist{}
 
 \pgfmathdeclareoperator{+}{add}     {2}{infix}{500}
 \pgfmathdeclareoperator{-}{subtract}{2}{infix}{500}
@@ -752,21 +790,27 @@
 
 \def\pgfmath@bgroup@pgfmath@{\pgfmath@}
 
-\def\pgfmath@bgroup@@strip{\futurelet\pgfmath@token@let\pgfmath@bgroup@@@strip}
-\def\pgfmath@bgroup@@@strip#1#2#3\pgfmath@@@{%
-	\ifx\pgfmath@token@let\bgroup%
-		\def\pgfmath@bgroup@test{#2}%
-		\ifx\pgfmath@bgroup@test\pgfmath@bgroup@pgfmath@%
-			\def\pgfmath@next{\pgfmath@bgroup@strip@{#1}}%
-		\else%
-			\let\pgfmath@bgroup@stripped=\pgfmath@bgroup@strip@last%
-			\let\pgfmath@next=\relax%
-		\fi%
-	\else%
-		\pgfmath@bgroup@@@@strip#1#2#3%
-		\let\pgfmath@next=\relax%
-	\fi%
-	\pgfmath@next%
-}
+\def\pgfmath@bgroup@@strip{%
+  \futurelet\pgfmath@token@let\pgfmath@bgroup@@@strip}
 
-\def\pgfmath@bgroup@@@@strip#1\pgfmath@\pgfmath@@{\def\pgfmath@bgroup@stripped{#1}}%
+\def\pgfmath@bgroup@@@strip#1#2#3\pgfmath@@@{%
+	\ifx\pgfmath@token@let\bgroup
+		\def\pgfmath@bgroup@test{#2}%
+		\ifx\pgfmath@bgroup@test\pgfmath@bgroup@pgfmath@
+			\def\pgfmath@next{\pgfmath@bgroup@strip@{#1}}%
+		\else
+			\let\pgfmath@bgroup@stripped=\pgfmath@bgroup@strip@last
+			\let\pgfmath@next=\relax
+		\fi
+	\else
+		\pgfmath@bgroup@@@@strip#1#2#3%
+		\let\pgfmath@next=\relax
+	\fi
+	\pgfmath@next}
+
+\def\pgfmath@bgroup@@@@strip#1\pgfmath@\pgfmath@@{%
+  \def\pgfmath@bgroup@stripped{#1}}
+
+% Local Variables:
+% tab-width: 2
+% End:

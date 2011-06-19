@@ -1,4 +1,5 @@
 % Copyright 2010 by Till Tantau
+% Copyright 2011 by Jannis Pohlmann
 %
 % This file may be distributed and/or modified
 %
@@ -15,9 +16,9 @@
 
 \tikzname\ offers a powerful path command for specifying how the nodes
 in a graph are connected by edges and arcs: The |graph| path
-command, which becomes available when you load the |graph| library.
+command, which becomes available when you load the |graphs| library.
 
-\begin{tikzlibrary}{graph}
+\begin{tikzlibrary}{graphs}
   The package must be loaded to use the |graph| path command.
 \end{tikzlibrary}
 
@@ -1871,6 +1872,38 @@ many situations, when you need advanced alignments you should use a
 \end{key}
 
 
+\subsubsection{Alternative Grid Placement}
+
+The following keys place nodes in a $N\times M$ grid. 
+\begin{key}{/tikz/graphs/grid placement}
+  This key works similar to |Cartesian placement|. As for that placement
+  strategy, a node has logical width and depth 1. However, the computed
+  total width and depth are mapped to a $N\times M$ grid.
+  The values of $N$ and $M$ depend on the size of the graph and the
+  value of |wrap after|. The number of columns $M$ is either set to 
+  |wrap after| explicitly or computed automatically as 
+  $\sqrt{\verb!|V|!}$. $N$ is the number of rows needed to lay out the 
+  graph in a grid with $M$ columns. 
+  \begin{codeexample}[]
+% An example with 6 nodes, 3 colums and therefor 2 rows
+\tikz \graph [grid placement] { subgraph I_n[n=6, wrap after=3] };
+  \end{codeexample}
+  \begin{codeexample}[]
+% An example with 9 nodes with columns and rows computed automatically
+\tikz \graph [grid placement] { subgraph Grid_n [n=9] };
+  \end{codeexample}
+  In case a user-defined graph instead of a pre-defined
+  |subgraph| is to be layed out using |grid placement|, |n| has to be
+  specified explicitely:
+  \begin{codeexample}[]
+\tikz \graph [grid placement] { 
+  [n=6, wrap after=3] 
+  a -- b -- c -- d -- e -- f 
+};
+  \end{codeexample}
+\end{key}
+
+
 \subsubsection{Placement On a Circle}
 
 The following keys place nodes on circles. Note that, typically, you
@@ -1941,6 +1974,7 @@ two keys |clockwise| or |counterclockwise|.
   \end{key}
 \end{key}
 
+\label{key-graphs-clockwise}%
 \begin{key}{/tikz/graphs/clockwise=\meta{number} (default \string\tikzgraphVnum)}
   This key sets the |group shift| so that if there are exactly
   \meta{number} many nodes in a group, they will form a complete
@@ -1955,8 +1989,9 @@ two keys |clockwise| or |counterclockwise|.
 \end{codeexample}
 \end{key}
 
+\label{key-graphs-counterclockwise}%
 \begin{key}{/tikz/graphs/counterclockwise=\meta{number} (default \string\tikzgraphVnum)}
-  Work like |clockwise|, only the direction is inverted.
+  Works like |clockwise|, only the direction is inverted.
 \end{key}
 
 \subsubsection{Manual Placement}
@@ -1964,7 +1999,7 @@ two keys |clockwise| or |counterclockwise|.
 \begin{key}{/tikz/graphs/no placement}
   This strategy simply ``switches off'' the whole placement
   mechanism, causing all nodes to be placed at the origin by
-  default. . You need to use this strategy if you position nodes ``by
+  default. You need to use this strategy if you position nodes ``by
   hand'' using explicit |shift| keys:
 \begin{codeexample}[]
 \tikz \graph [no placement]
@@ -2387,6 +2422,45 @@ is to the following two keys:
 \tikz \graph [clockwise] { subgraph C_n [n=7, ->] };    
 \end{codeexample}
 \end{graph}
+
+
+\begin{graph}{subgraph Grid\_n}
+  This graph is a grid of the vertices in |V|.
+  \begin{key}{/tikz/graphs/wrap after=\meta{number}}
+    Defines the number of nodes placed in a single row of the grid. This
+    value implicitly defines the number of grid columns as well.
+    In the following example a |grid placement| is used to visualize the
+    edges created between the nodes of a |Grid_n| |subgraph| using
+    different values for |wrap after|.
+    \begin{codeexample}[]
+\tikz \graph [grid placement] { subgraph Grid_n [n=3,wrap after=1] };
+\tikz \graph [grid placement] { subgraph Grid_n [n=3,wrap after=3] };
+    \end{codeexample}
+    \begin{codeexample}[]
+\tikz \graph [grid placement] { subgraph Grid_n [n=4,wrap after=2] };
+\tikz \graph [grid placement] { subgraph Grid_n [n=4] };
+    \end{codeexample}
+  \end{key}
+\end{graph}
+
+
+% TODO: Implement the Grid_nm subgraph described here:
+%
+%\begin{graph}{subgraph Grid\_nm}
+%  This graph is a grid built from the cartesian product of the two node
+%  sets |V| and |W| which are either defined using the keys
+%  |/tikz/graphs/V| and |/tikz/graphs/W| or |/tikz/graphs/n| and
+%  |/tikz/graphs/m| or a mixture of both. 
+%  
+%  The resulting |Grid_nm| subgraph has $n$ ``rows'' and $m$ ``columns'' and
+%  the nodes are named |V i W j| with $1\le i\le n$ and $1\le j\le n$.
+%  The names of the two shores |V| and |W| can be changed as described in
+%  the documentation of the keys |/tikz/graphs/name shore V| and
+%  |/tikz/graphs/name shore W|.
+%  \begin{codeexample}[]
+%\tikz \graph [grid placement] { subgraph Grid_nm [V={1,2,3}, W={4, 5, 6}] };
+%  \end{codeexample}
+%\end{graph}
 
 
 

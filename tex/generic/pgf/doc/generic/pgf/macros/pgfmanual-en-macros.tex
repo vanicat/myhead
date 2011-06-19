@@ -7,7 +7,7 @@
 %
 % See the file doc/generic/pgf/licenses/LICENSE for more details.
 
-% $Header: /cvsroot/pgf/pgf/doc/generic/pgf/macros/pgfmanual-en-macros.tex,v 1.48 2011/03/14 23:17:51 tantau Exp $
+% $Header: /cvsroot/pgf/pgf/doc/generic/pgf/macros/pgfmanual-en-macros.tex,v 1.54 2011/05/11 17:22:36 tantau Exp $
 
 
 
@@ -47,6 +47,36 @@
 {
   \end{pgfmanualentry}
 }
+
+\makeatletter
+\newenvironment{luacommand}[1]{
+  \medskip%
+  \parskip0pt%
+  \leftskip2em\parindent-2em%
+  \leftmargin2em%
+  \advance\@totalleftmargin \leftmargin%
+  \luaextractcommand#1\relax%
+  \let\item=\parameteritem%
+  \let\list=\restorelist%
+  % \pgfmanualbody
+}
+{
+%  \smallskip
+}
+
+
+\newenvironment{parameterdescription}{\unskip%
+  \let\item=\parameteritem%
+  \let\list=\restorelist%
+}
+{
+}
+\let\saveditemcommand=\item
+\let\savedlistcommand=\list
+\def\denselist#1#2{\savedlistcommand{#1}{#2}\parskip0pt\itemsep0pt}
+\def\restorelist{\let\item=\saveditemcommand\denselist}
+\def\parameteritem{\pgfutil@ifnextchar[\parameteritem@{}}%}
+\def\parameteritem@[#1]{\def\test{#1}\ifx\test\pgfutil@empty\else\hskip.7em#1:\fi}
 
 \newenvironment{commandlist}[1]{%
 	\begin{pgfmanualentry}
@@ -205,6 +235,13 @@
   \pgfmanualpdflabel{\textbackslash\strippedat}{}%
 }
 
+\def\luaextractcommand#1#2\relax{%
+  \declare{\texttt{\string#1}}#2\par%
+%  \removeats{#1}%
+ % \index{\strippedat @\protect\myprintocmmand{\strippedat}}
+ % \pgfmanualpdflabel{\textbackslash\strippedat}{}%
+}
+
 
 % \begin{environment}{{name}\marg{arguments}}
 \renewenvironment{environment}[1]{
@@ -291,6 +328,21 @@
   	\pgfmanualentryheadline{Graph {\ttfamily\declare{#1}}}%
     \index{#1@\protect\texttt{#1} graph}%
     \index{Graphs!#1@\protect\texttt{#1}}
+    \pgfmanualpdflabel{#1}{}%
+    \pgfmanualbody
+}
+{
+  \end{pgfmanualentry}
+}
+
+\newenvironment{gdalgorithm}[1]{
+  \begin{pgfmanualentry}
+  	\pgfmanualentryheadline{Graph drawing algorithm {\ttfamily\declare{#1}}}%
+    \index{#1@\protect\texttt{#1} graph drawing algorithm}%
+    \index{Graph drawing algorithms!#1@\protect\texttt{#1}}
+    \item{\small Usage: {\ttfamily/graph drawing/#1=}\meta{options}}\par
+    \item{\small alias {\ttfamily/tikz/#1}}\par
+    \item{\small alias {\ttfamily/tikz/graphs/#1}}\par
     \pgfmanualpdflabel{#1}{}%
     \pgfmanualbody
 }

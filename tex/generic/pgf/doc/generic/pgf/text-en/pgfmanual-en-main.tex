@@ -86,6 +86,18 @@
   graphs.standard
 }
 
+\usepackage{ifluatex}
+\ifluatex
+\usetikzlibrary{
+  graphdrawing,
+  graphdrawing.misc,
+  graphdrawing.trees,
+  graphdrawing.force
+}
+\fi
+
+
+
 \iffalse
 %\iftrue
 	\tikzexternalize[
@@ -104,7 +116,7 @@
 \usepackage{xxcolor}
 \usepackage{pifont}
 \usepackage{makeidx}
-\usepackage{ifluatex}
+
 \ifluatex
   \usepackage{luatextra}
   % \filedescription is defined in expl3, required by fontspec,
@@ -152,13 +164,18 @@
 
 \begin{document}
 
-%\include{pgfmanual-en-library-plot-handlers}
-% \include{pgfmanual-en-library-graphs}
-
-%\end{document}
+\ifluatex
+\include{pgfmanual-en-tikz-graphdrawing}
+%\include{pgfmanual-en-library-graphdrawing-trees}
+\include{pgfmanual-en-library-graphdrawing-force}
+%\include{pgfmanual-en-library-graphdrawing-misc}
+\include{pgfmanual-en-base-graphdrawing}
+\fi
+\end{document}
 
 %\include{pgfmanual-en-dv-introduction}
 %\include{pgfmanual-en-dv-main}
+%\include{pgfmanual-en-dv-axes}
 %\include{pgfmanual-en-dv-formats}
 %\include{pgfmanual-en-dv-axes}
 %\include{pgfmanual-en-dv-visualizers}
@@ -526,7 +543,8 @@ installation, read the present part.
 \include{pgfmanual-en-tikz-paths}
 \include{pgfmanual-en-tikz-actions}
 \include{pgfmanual-en-tikz-shapes}
-\include{pgfmanual-en-library-graphs}
+\include{pgfmanual-en-tikz-graphs}
+\include{pgfmanual-en-tikz-graphdrawing}
 \include{pgfmanual-en-tikz-matrices}
 \include{pgfmanual-en-tikz-trees}
 \include{pgfmanual-en-tikz-plots}
@@ -542,6 +560,7 @@ installation, read the present part.
 {\Large \emph{by Till Tantau}}
 
 
+% FIXME : CF resume correcting spelling problems here
 \bigskip
 \noindent
 In this part the library packages are documented. They
@@ -623,6 +642,9 @@ many users will not need them.
 \include{pgfmanual-en-library-fit}
 \include{pgfmanual-en-library-fixedpoint}
 \include{pgfmanual-en-library-fpu}
+\include{pgfmanual-en-library-graphdrawing-tree}
+\include{pgfmanual-en-library-graphdrawing-force}
+\include{pgfmanual-en-library-graphdrawing-misc}
 \include{pgfmanual-en-library-lsystems}
 \include{pgfmanual-en-library-matrices}
 \include{pgfmanual-en-library-mindmaps}
@@ -651,6 +673,31 @@ many users will not need them.
 \bigskip
 \noindent
 
+\begin{codeexample}[graphic=white]
+\tikz \datavisualization [scientific axes=clean]
+[
+  visualize as smooth line=Gaussian,
+  Gaussian={pin in data={text={$e^{-x^2}$},when=x is 1}}
+]
+data [format=function] {
+  var x : interval [-7:7] samples 51;
+  func y = exp(-\value x*\value x);
+}
+[
+  visualize as scatter,
+  legend={south east outside},
+  scatter={
+    style={mark=*,mark size=1.4pt},
+    label in legend={text={
+        $\sum_{i=1}^{10} x_i$, where $x_i \sim U(-1,1) $}}}
+]
+data [format=function] {
+  var i : interval [0:1] samples 20;
+  func y = 0;
+  func x = (rand + rand + rand + rand + rand +
+            rand + rand + rand + rand + rand);
+};
+\end{codeexample}
 
 \include{pgfmanual-en-dv-introduction}
 \include{pgfmanual-en-dv-main}
@@ -808,6 +855,7 @@ object-oriented programming in \TeX. It allows the definition of
 \include{pgfmanual-en-base-actions}
 \include{pgfmanual-en-base-arrows}
 \include{pgfmanual-en-base-nodes}
+\include{pgfmanual-en-base-graphdrawing}
 \include{pgfmanual-en-base-matrices}
 \include{pgfmanual-en-base-transformations}
 \include{pgfmanual-en-base-patterns}
