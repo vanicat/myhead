@@ -8,7 +8,7 @@
 --
 -- See the file doc/generic/pgf/licenses/LICENSE for more information
 
--- @release $Header: /cvsroot/pgf/pgf/generic/pgf/graphdrawing/core/lualayer/pgflibrarygraphdrawing-edge.lua,v 1.5 2011/05/17 21:45:33 jannis-pohlmann Exp $
+-- @release $Header: /cvsroot/pgf/pgf/generic/pgf/graphdrawing/core/lualayer/pgflibrarygraphdrawing-edge.lua,v 1.9 2011/07/26 11:29:06 jannis-pohlmann Exp $
 
 -- This file defines an edge class, used in the graph representation.
 
@@ -86,6 +86,21 @@ end
 
 
 
+--- Checks whether or not the edge is a loop edge.
+--
+-- An edge is a loop if it one node multiple times and no other node.
+--
+-- @return |true| if the edge is a loop, |false| otherwise.
+--
+function Edge:isLoop()
+  local nodes_equal = table.combine_values(self.nodes, function (nodes_equal, node)
+    return nodes_equal and node == self.nodes[1]
+  end, true)
+  return nodes_equal
+end
+
+
+
 --- Returns whether or not the edge is a hyperedge.
 --
 -- A hyperedge is an edge with more than two adjacent nodes.
@@ -128,30 +143,10 @@ end
 -- @param node The node to be added to the edge.
 --
 function Edge:addNode(node)
-  if not self:containsNode(node) then
+  --if not self:containsNode(node) then
     table.insert(self.nodes, node)
     node:addEdge(self)
-  end
-end
-
-
-
---- Returns all neighbours of a node adjacent to the edge.
---
--- The edge direction is not taken into account, so this method always returns
--- all neighbours even if called on a directed edge.
---
--- @param node A node. Typically but not necessarily adjacent to the edge.
---                     If the node is not an intermediate or end point of the
---                     edge, an empty array is returned.
---
--- @return An array of nodes that are adjacent to the input node via the edge
---         the method is called on.
---
-function Edge:getNeighbours(node)
-  return table.filter_values(self.nodes, function (other)
-    return other.name ~= node.name
-  end)
+  --end
 end
 
 
@@ -163,7 +158,11 @@ end
 -- @return The first neighbour of the node.
 --
 function Edge:getNeighbour(node)
-  return self:getNeighbours(node)[1]
+  if node == self.nodes[1] then
+    return self.nodes[#self.nodes]
+  else
+    return self.nodes[1]
+  end
 end
 
 
@@ -178,14 +177,44 @@ end
 
 
 
+function Edge:getHead()
+  -- by default, the head of -> edges is the last node and the head
+  -- of <- edges is the first node
+  local head_index = (self.direction == Edge.LEFT) and 1 or #self.nodes
+
+  -- if the edge should be assumed reversed, we simply switch head and 
+  -- tail positions
+  if not ignore_reversed and self.reversed then
+    head_index = (head_index == 1) and #self.nodes or 1
+  end
+
+  return self.nodes[head_index]
+end
+
+
+
+function Edge:getTail()
+  -- by default, the tail of -> edges is the first node and the tail
+  -- of <- edges is the last node
+  local tail_index = (self.direction == Edge.LEFT) and #self.nodes or 1
+
+  -- if the edge should be assumed reversed, we simply switch head
+  -- and tail positions
+  if not ignore_reversed and self.reversed then
+    tail_index = (tail_index == 1) and #self.nodes or 1
+  end
+
+  return self.nodes[tail_index]
+end
+
+
+
 --- Checks whether a node is the head of the edge. Does not work for hyperedges.
 --
 -- This method only works for edges with two adjacent nodes.
 --
--- For undirected edges or edges that point into both directions, the result
--- will always be true. 
--- Directed edges may be reversed internally, so their head and tail might be 
--- switched. Whether or not this internal reversal is handled by this method 
+-- Edges may be reversed internally, so their head and tail might be switched. 
+-- Whether or not this internal reversal is handled by this method 
 -- can be specified with the optional second \meta{ignore\_reversed} parameter 
 -- which is |false| by default.
 --
@@ -198,27 +227,21 @@ end
 function Edge:isHead(node, ignore_reversed)
   local result = false
 
-  if self.direction == Edge.UNDIRECTED or self.direction == Edge.BOTH then
-    -- undirected edges or edges pointing into both directions do not
-    -- distinguish between head and tail nodes, so we always return true
-    -- here
-    result = true
-  else
-    -- by default, the head of -> edges is the last node and the head
-    -- of <- edges is the first node
-    local head_index = (self.direction == Edge.RIGHT) and #self.nodes or 1
+  -- by default, the head of -> edges is the last node and the head
+  -- of <- edges is the first node
+  local head_index = (self.direction == Edge.LEFT) and 1 or #self.nodes
 
-    -- if the edge should be assumed reversed, we simply switch head and 
-    -- tail positions
-    if not ignore_reversed and self.reversed then
-      head_index = (head_index == 1) and #self.nodes or 1
-    end
-
-    -- check if the head node equals the input node
-    if self.nodes[head_index].name == node.name then
-      result = true
-    end
+  -- if the edge should be assumed reversed, we simply switch head and 
+  -- tail positions
+  if not ignore_reversed and self.reversed then
+    head_index = (head_index == 1) and #self.nodes or 1
   end
+
+  -- check if the head node equals the input node
+  if self.nodes[head_index].name == node.name then
+    result = true
+  end
+
   return result
 end
 
@@ -228,11 +251,8 @@ end
 --
 -- This method only works for edges with two adjacent nodes.
 --
--- For undirected edges or edges that point into both directions, the result
--- will always be true. 
---
--- Directed edges may be reversed internally, so their head and tail might be 
--- switched. Whether or not this internal reversal is handled by this method 
+-- Edges may be reversed internally, so their head and tail might be switched.
+-- Whether or not this internal reversal is handled by this method 
 -- can be specified with the optional second \meta{ignore\_reversed} parameter 
 -- which is |false| by default.
 --
@@ -244,27 +264,22 @@ end
 --
 function Edge:isTail(node, ignore_reversed)
   local result = false
-  if self.direction == Edge.UNDIRECTED or self.direction == Edge.BOTH then
-    -- undirected edges or edges pointing into both directions do not
-    -- distinguish between head and tail nodes, so we always return true
-    -- here
-    result = true
-  else
-    -- by default, the tail of -> edges is the first node and the tail
-    -- of <- edges is the last node
-    local tail_index = (self.direction == Edge.RIGHT) and 1 or #self.nodes
+  
+  -- by default, the tail of -> edges is the first node and the tail
+  -- of <- edges is the last node
+  local tail_index = (self.direction == Edge.LEFT) and #self.nodes or 1
 
-    -- if the edge should be assumed reversed, we simply switch head
-    -- and tail positions
-    if not ignore_reversed and self.reversed then
-      tail_index = (tail_index == 1) and #self.nodes or 1
-    end
-
-    -- check if the tail node equals the input node
-    if self.nodes[tail_index].name == node.name then
-      result = true
-    end
+  -- if the edge should be assumed reversed, we simply switch head
+  -- and tail positions
+  if not ignore_reversed and self.reversed then
+    tail_index = (tail_index == 1) and #self.nodes or 1
   end
+
+  -- check if the tail node equals the input node
+  if self.nodes[tail_index].name == node.name then
+    result = true
+  end
+
   return result
 end
 
@@ -285,25 +300,25 @@ function Edge:copy()
 
 
 
---- Returns whether or not the two edges have the same adjacent nodes.
---
--- @ignore This should not appear in the documentation.
---
--- @param other Another edge to compare with.
---
--- @return |true| if the two edges have exactly the same adjacent nodes.
---
-function Edge:__eq(other)
-  if not other or not other.nodes or #self.nodes ~= #other.nodes then
-    return false
-  end
-  
-  local same_nodes = true
-  for i = 1,#self.nodes do
-    same_nodes = same_nodes and (self.nodes[i] == other.nodes[i])
-  end
-  return same_nodes
-end
+----- Returns whether or not the two edges have the same adjacent nodes.
+----
+---- @ignore This should not appear in the documentation.
+----
+---- @param other Another edge to compare with.
+----
+---- @return |true| if the two edges have exactly the same adjacent nodes.
+----
+--function Edge:__eq(other)
+--  if not other or not other.nodes or #self.nodes ~= #other.nodes then
+--    return false
+--  end
+--  
+--  local same_nodes = true
+--  for i = 1,#self.nodes do
+--    same_nodes = same_nodes and (self.nodes[i] == other.nodes[i])
+--  end
+--  return same_nodes
+--end
 
 
 
@@ -321,11 +336,18 @@ function Edge:__tostring()
     end)
     result = result .. table.concat(node_strings, ', ')
   end
-  return result .. ")"
-
-  -- Note: the following line generates a shorter string representation
+  --return result .. ")"
+  
+  -- Note: the following lines generate a shorter string representation
   -- of the edge that is more readable and can be used for debugging.
   -- So please don't remove this:
   --
-  --return self.nodes[1].name .. ' ' .. self.direction .. ' ' .. self.nodes[2].name .. ' [level ' .. (self.level or 0) .. ']'
+  local node_strings = table.map_values(self.nodes, function (node)
+    return node.name
+  end)
+  if self.reversed then
+    return table.concat(table.reverse_values(node_strings), ' ' .. self.direction .. ' ')
+  else
+    return table.concat(node_strings, ' ' .. self.direction .. ' ')
+  end
 end

@@ -8,7 +8,7 @@
 --
 -- See the file doc/generic/pgf/licenses/LICENSE for more information
 
--- @release $Header: /cvsroot/pgf/pgf/generic/pgf/graphdrawing/core/lualayer/pgflibrarygraphdrawing-node.lua,v 1.3 2011/05/14 16:49:11 jannis-pohlmann Exp $
+-- @release $Header: /cvsroot/pgf/pgf/generic/pgf/graphdrawing/core/lualayer/pgflibrarygraphdrawing-node.lua,v 1.5 2011/07/20 21:00:58 jannis-pohlmann Exp $
 
 -- This file defines a node class, used in the graph representation.
 
@@ -82,7 +82,7 @@ end
 -- @return Width of the node.
 --
 function Node:getTexWidth()
-	return self.tex.maxX - self.tex.minX
+	return math.abs(self.tex.maxX - self.tex.minX)
 end
 
 
@@ -92,7 +92,7 @@ end
 -- @return Height of the node.
 --
 function Node:getTexHeight()
-  return self.tex.maxY - self.tex.minY
+  return math.abs(self.tex.maxY - self.tex.minY)
 end
 
 
@@ -102,9 +102,9 @@ end
 -- @param edge The edge to be added.
 --
 function Node:addEdge(edge)
-  if not table.find(self.edges, function (other) return other == edge end) then
+  --if not table.find(self.edges, function (other) return other == edge end) then
     table.insert(self.edges, edge)
-  end
+  --end
 end
 
 

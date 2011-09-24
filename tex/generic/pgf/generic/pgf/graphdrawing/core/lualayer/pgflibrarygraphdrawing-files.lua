@@ -7,13 +7,14 @@
 --
 -- See the file doc/generic/pgf/licenses/LICENSE for more information
 
--- @release $Header: /cvsroot/pgf/pgf/generic/pgf/graphdrawing/core/lualayer/pgflibrarygraphdrawing-files.lua,v 1.3 2011/05/12 02:10:37 jannis-pohlmann Exp $
+-- @release $Header: /cvsroot/pgf/pgf/generic/pgf/graphdrawing/core/lualayer/pgflibrarygraphdrawing-files.lua,v 1.7 2011/07/26 11:29:06 jannis-pohlmann Exp $
 
 -- This file defines a list of initial files to load.
 
 local files = {
    "module",
    "table",
+   "stack",
    "iter",
    "string",
    "sys",
@@ -23,7 +24,10 @@ local files = {
    "box",
    "node",
    "edge",
+   "cluster",
    "graph",
+   "manipulation",
+   "depth-first-search",
    "traversal",
    "fibonacci-heap",
    "priority-queue",
@@ -34,6 +38,8 @@ local files = {
    "orientation",
    "positioning-helpers",
    "texboxregister",
+   "ranking",
+   "network-simplex",
 --   "test-path",
 --   "test-box",
 --   "test-vector",

@@ -8,7 +8,7 @@
 --
 -- See the file doc/generic/pgf/licenses/LICENSE for more information
 
--- @release $Header: /cvsroot/pgf/pgf/generic/pgf/graphdrawing/core/lualayer/pgflibrarygraphdrawing-interface.lua,v 1.6 2011/05/15 14:15:45 jannis-pohlmann Exp $
+-- @release $Header: /cvsroot/pgf/pgf/generic/pgf/graphdrawing/core/lualayer/pgflibrarygraphdrawing-interface.lua,v 1.11 2011/07/26 11:29:06 jannis-pohlmann Exp $
 
 -- This file defines the Interface global object, which is used as a
 -- simplified frontend in the TeX part of the library.
@@ -71,25 +71,37 @@ end
 
 --- Adds a new node to the graph.
 --
--- The options string of |{key}{value}| pairs is parsed and assigned
--- to the node. Graph drawing algorithms may use these options to treat
--- the node in special ways.
+-- This function is called for each node of the graph by the \TeX\
+-- layer. The \meta{name} is the name of the node including the
+-- internal prefix added by the \TeX\ layer to indicate that the node
+-- ``does not yet exist.'' The parameters \meta{xMin} to \meta{yMax}
+-- specify a bounding box around the node; note that the origin lies
+-- at the anchor postion of the node. The \meta{options} are a string
+-- in the format of a sequence of |{key}{value}| pairs. They are
+-- parsed and stored in the newly created node object on the Lua
+-- layer. Graph drawing algorithms may use these options to treat 
+-- the node in special ways. The \meta{lateSetup} is \TeX\ code that
+-- just needs to be passed back when the node is finally
+-- positioned. It is used to add ``decorations'' to a node after
+-- positioning like a label.
 --
--- @param name    Name of the node.
--- @param xMin    Minimum x point of the bouding box.
--- @param yMin    Minimum y point of the bouding box.
--- @param xMax    Maximum x point of the bouding box.
--- @param yMax    Maximum y point of the bouding box.
--- @param options Options for the node.
+-- @param name      Name of the node.
+-- @param xMin      Minimum x point of the bouding box.
+-- @param yMin      Minimum y point of the bouding box.
+-- @param xMax      Maximum x point of the bouding box.
+-- @param yMax      Maximum y point of the bouding box.
+-- @param options   Lua-Options for the node.
+-- @param lateSetup Options for the node.
 --
-function Interface:addNode(name, xMin, yMin, xMax, yMax, options)
+function Interface:addNode(name, xMin, yMin, xMax, yMax, options, lateSetup)
   assert(self.graph, "no graph created")
   local tex = {
     texNode = TeXBoxRegister:insertBox(Sys:getTeXBox()), 
     maxX = xMax,
     minX = xMin,
     maxY = yMax,
-    minY = yMin
+    minY = yMin,
+    texLateSetup = lateSetup
   }
   local node = Node:new{
     name = Sys:unescapeTeXNodeName(name), 
@@ -122,14 +134,37 @@ end
 function Interface:addEdge(from, to, direction, parameters, tikz_options, aux)
   assert(self.graph, "no graph created")
   Sys:log("GD:INT: Edge " .. tostring(from) .. " " .. tostring(direction) .. " " .. tostring(to))
-  from = self.graph:findNode(from)
-  to = self.graph:findNode(to)
-  assert(from and to, "at least one node doesn't exist yet")
+  local from_node = self.graph:findNode(from)
+  local to_node = self.graph:findNode(to)
+  assert(from_node and to_node, 'cannot add the edge because its nodes "' .. from .. '" and "' .. to .. '" are missing')
   if direction == Edge.NONE then
-    self.graph:deleteEdgeBetweenNodes(from, to)
+    self.graph:deleteEdgeBetweenNodes(from_node, to_node)
   else
-    self.graph:createEdge(from, to, direction, aux, string.parse_braces(parameters), tikz_options)
+    self.graph:createEdge(from_node, to_node, direction, aux, string.parse_braces(parameters), tikz_options)
   end
+end
+
+
+
+function Interface:addNodeToCluster(node_name, cluster_name)
+  assert(self.graph, 'no graph created')
+  
+  -- find the node
+  local node = self.graph:findNode(node_name)
+
+  assert(node, 'cannot add node "' .. node_name .. '" to cluster "' .. cluster_name .. '" because the node does not exist')
+  
+  -- find the cluster
+  local cluster = self.graph:findClusterByName(cluster_name)
+
+  -- if it doesn't exist yet, create it on demand
+  if not cluster then
+    cluster = Cluster:new(cluster_name)
+    self.graph:addCluster(cluster)
+  end
+
+  -- add the node to the cluster
+  cluster:addNode(node)
 end
 
 
@@ -164,6 +199,74 @@ function Interface:loadAlgorithm(name)
 
   -- look up the main algorithm function
   return pgf.graphdrawing[function_name]
+end
+
+
+
+-- TODO: Jannis: Document this method.
+function Interface:convertFilenameToClassname(filename)
+  local pre_substitutions = {
+    ['-'] = ' ',
+    ['_'] = ' ',
+  }
+  for char, replacement in pairs(pre_substitutions) do
+    filename = filename:gsub(char, replacement)
+  end
+
+  filename = filename:gsub("^(%a)", string.upper, 1)
+  filename = filename:gsub("%s+(%a)", string.upper)
+
+  local post_substitutions = {
+    [' '] = '',
+  }
+  for char, replacement in pairs(post_substitutions) do
+    filename = filename:gsub(char, replacement)
+  end
+
+  return filename
+end
+
+
+
+-- TODO: Jannis: Document this method.
+function Interface:convertClassnameToFilename(classname)
+  local source = {}
+  for n = 1, classname:len() do
+    source[n] = classname:sub(n, n)
+  end
+
+  local target = {}
+
+  local source_pos = 1
+  local target_pos = 1
+
+  for source_pos = 1, #source do
+    if source[source_pos]:gsub('%a', '') == '' then
+      if source[source_pos] == source[source_pos]:upper() then
+        if source_pos == 1 then
+          target[target_pos] = source[source_pos]
+          target_pos = target_pos + 1
+        else
+          if source[source_pos-1] == source[source_pos-1]:upper() then
+            target[target_pos] = source[source_pos]
+            target_pos = target_pos + 1
+          else
+            target[target_pos] = ' '
+            target[target_pos + 1] = source[source_pos]
+            target_pos = target_pos + 2
+          end
+        end
+      else
+        target[target_pos] = source[source_pos]
+        target_pos = target_pos + 1
+      end
+    else
+      target[target_pos] = source[source_pos]
+      target_pos = target_pos + 1
+    end
+  end
+
+  return table.concat(target, '')
 end
 
 
@@ -216,15 +319,19 @@ function Interface:finishGraph()
   
   Sys:log("GD:INT: graph = " .. tostring(graph))
   
+  Sys:beginNodeShipout()
   for node in table.value_iter(graph.nodes) do
     Sys:log("GD:INT: node = " .. tostring(node))
     self:drawNode(node)
   end
-  
+  Sys:endNodeShipout()
+
+  Sys:beginEdgeShipout()
   for edge in table.value_iter(graph.edges) do
     Sys:log("GD:INT: edge = " .. tostring(edge))
     self:drawEdge(edge)
   end
+  Sys:endEdgeShipout()
   
   Sys:endShipout()
 end
@@ -243,7 +350,8 @@ function Interface:drawNode(node)
                 node.tex.maxX,
                 node.tex.maxY,
                 node.pos:x(),
-                node.pos:y())
+                node.pos:y(),
+                node.tex.texLateSetup)
 end
 
 

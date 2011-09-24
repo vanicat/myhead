@@ -7,7 +7,7 @@
 %
 % See the file doc/generic/pgf/licenses/LICENSE for more details.
 
-\ProvidesFileRCS[v\pgfversion] $Header: /cvsroot/pgf/pgf/generic/pgf/graphdrawing/algorithms/layered/pgflibrarygraphdrawing.layered.code.tex,v 1.1 2011/05/30 17:09:26 jannis-pohlmann Exp $
+\ProvidesFileRCS[v\pgfversion] $Header: /cvsroot/pgf/pgf/generic/pgf/graphdrawing/algorithms/layered/pgflibrarygraphdrawing.layered.code.tex,v 1.5 2011/07/26 11:29:05 jannis-pohlmann Exp $
 
 
 
@@ -22,7 +22,7 @@
   layered drawing/.forward to={/graph drawing/\pgfkeysvalueof{/graph drawing/layered drawing/default algorithm}}
 }
 
-\pgfkeys{/graph drawing/layered drawing/default algorithm/.initial=GansnerKNV layered}
+\pgfkeys{/graph drawing/layered drawing/default algorithm/.initial=modular layered}
 
 
 %
@@ -40,13 +40,16 @@
   sibling distance/.graph parameter=evaluate math expression,
   sibling distance/.parameter initial=1cm,
   %
+  first layer/.graph parameter,
+  last layer/.graph parameter,
+  %
   % Node parameters for layered drawing algorithms.
   %
   %
   % Edge parameters for layered drawing algorithms.
   %
   weight/.edge parameter,
-  weight/.parameter initial=1cm,
+  weight/.parameter initial=1,
   %
   minimum levels/.edge parameter,
   minimum levels/.parameter initial=1,
@@ -61,21 +64,37 @@
 %   Gansner, Koutsofios, North, Vo, 1993
 %
 \pgfgddeclarealgorithmkey
-  {GansnerKNV layered}
+  {GansnerKNV1993 layered}
   {layered drawing}
   {
-    algorithm=GansnerKNV layered,
+    algorithm=GansnerKNV1993 layered,
   }
 
 
 %
-% Algorithm for generating layered drawings of directed graphs, compiled
-% from different sources to pick good heuristics for every step of the
-% general layered drawing method.
+% Modular algorithm for generating layered drawings of directed graphs.
+% For the various steps of the algorithm (cycle removal, node ranking, 
+% minimization of edge crossings and edge routing) different sub-algorithms
+% can be selected.
 %
 \pgfgddeclarealgorithmkey
-  {Pohlmann layered}
+  {modular layered}
   {layered drawing}
   {
-    algorithm=Pohlmann layered,
+    algorithm=modular layered,
+    %
+    layered drawing/cycle removal/.graph parameter,
+    layered drawing/cycle removal/.parameter initial=GansnerKNV1993,
+    %
+    layered drawing/node ranking/.graph parameter,
+    layered drawing/node ranking/.parameter initial=GansnerKNV1993,
+    %
+    layered drawing/crossing minimization/.graph parameter,
+    layered drawing/crossing minimization/.parameter initial=GansnerKNV1993,
+    %
+    layered drawing/node positioning/.graph parameter,
+    layered drawing/node positioning/.parameter initial=GansnerKNV1993,
+    %
+    layered drawing/edge routing/.graph parameter,
+    layered drawing/edge routing/.parameter initial=GansnerKNV1993,
   }

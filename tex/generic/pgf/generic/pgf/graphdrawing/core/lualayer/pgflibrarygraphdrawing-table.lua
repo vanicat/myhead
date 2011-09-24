@@ -8,7 +8,7 @@
 --
 -- See the file doc/generic/pgf/licenses/LICENSE for more information
 
--- @release $Header: /cvsroot/pgf/pgf/generic/pgf/graphdrawing/core/lualayer/pgflibrarygraphdrawing-table.lua,v 1.2 2011/06/03 21:32:17 jannis-pohlmann Exp $
+-- @release $Header: /cvsroot/pgf/pgf/generic/pgf/graphdrawing/core/lualayer/pgflibrarygraphdrawing-table.lua,v 1.5 2011/06/30 22:35:16 jannis-pohlmann Exp $
 
 --- This file contains a number of helper functions for tables, including
 --- functions to create key and value iterators, copy tables, map table
@@ -52,6 +52,25 @@ function table.custom_merge(table1, table2, first_metatable)
     end
   end
 
+  if not first_metatable or not getmetatable(result) then
+    setmetatable(result, getmetatable(table2))
+  end
+
+  return result
+end
+
+
+
+--- Concatenates the values of two flat tables.
+--
+function table.merge_values(table1, table2, first_metatable)
+  local result = table1 and table.custom_copy(table1) or {}
+  local first_metatable = first_metatable == true or false
+
+  for value in table.value_iter(table2) do
+    table.insert(result, value)
+  end
+  
   if not first_metatable or not getmetatable(result) then
     setmetatable(result, getmetatable(table2))
   end
@@ -401,6 +420,22 @@ end
 
 
 
+--- Iterates over all values of a flat table or array in reverse order.
+function table.reverse_value_iter(input)
+  local index = #input
+  return function ()
+    if index <= 0 then
+      return nil
+    else
+      local value = input[index]
+      index = index - 1
+      return value
+    end
+  end
+end
+
+
+
 --- Iterate over the values of \meta{table} in a truely random order.
 --
 -- @param table The table whose values to iterate over.
@@ -465,6 +500,25 @@ function table.count_pairs(input)
   return table.combine_pairs(input, function (count, k, v) 
     return count + 1 
   end, 0)
+end
+
+
+
+-- TODO: Jannis: Document this method.
+function table.remove_pairs(input, remove_func)
+  local removals = {}
+
+  for key, value in pairs(input) do
+    if remove_func(key, value) then
+      table.insert(removals, key)
+    end
+  end
+
+  for key in table.value_iter(removals) do
+    input[key] = nil
+  end
+  
+  return input
 end
 
 

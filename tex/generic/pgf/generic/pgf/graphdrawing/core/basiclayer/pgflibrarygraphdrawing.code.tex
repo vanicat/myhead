@@ -8,7 +8,7 @@
 %
 % See the file doc/generic/pgf/licenses/LICENSE for more details.
 
-\ProvidesFileRCS[v\pgfversion] $Header: /cvsroot/pgf/pgf/generic/pgf/graphdrawing/core/basiclayer/pgflibrarygraphdrawing.code.tex,v 1.10 2011/05/30 17:09:26 jannis-pohlmann Exp $
+\ProvidesFileRCS[v\pgfversion] $Header: /cvsroot/pgf/pgf/generic/pgf/graphdrawing/core/basiclayer/pgflibrarygraphdrawing.code.tex,v 1.13 2011/07/26 11:29:06 jannis-pohlmann Exp $
 
 
 
@@ -450,20 +450,42 @@
 
 
 
+% Callbacks: Called before the shipout of nodes and edges starts
+%
+% First, the general begin shipout is called. Then, the node shipout
+% starts, the nodes are created, and then the end of the node shipout
+% is signaled. Next, the edge shipout starts and ends. Finally, the
+% end shipout is called.
 
-%
-% Begins the ship out of nodes
-%
 \def\pgfgdbeginshipout{%
-  \pgfscope
+  \pgfscope%
+  \catcode`\@=11\relax%
 }
-
-%
-% End the shop out of nodes
-%
 \def\pgfgdendshipout{%
+    \box\pgf@gd@node@box%
   \endpgfscope
 }
+
+\newbox\pgf@gd@node@box
+\def\pgfgdbeginnodeshipout{%
+  \ifpgf@gd@edges@behind@nodes%
+    \setbox\pgf@gd@node@box=\hbox\bgroup%
+  \fi%
+}
+\def\pgfgdendnodeshipout{%
+  \ifpgf@gd@edges@behind@nodes%
+    \egroup%
+  \fi%
+}
+
+\def\pgfgdbeginedgeshipout{%
+}
+
+\def\pgfgdendedgeshipout{%
+}
+
+\newif\ifpgf@gd@edges@behind@nodes
+\pgf@gd@edges@behind@nodestrue
 
 
 
@@ -771,6 +793,14 @@
 
 
 
+\pgfgddeclareforwardedkeys{/graph drawing}{
+  nodes behind edges/.code=\pgf@gd@edges@behind@nodesfalse,
+  edges behind nodes/.code=\pgf@gd@edges@behind@nodestrue
+}
+
+
+
+
 % 
 % Orientation and transformation keys 
 %
@@ -865,7 +895,7 @@
 % Desired positiong for a node
 % 
 % #1 = an x-position
-% #2 = a y-position
+% #2 = an y-position
 % 
 % Description:
 % 
@@ -879,6 +909,24 @@
 
 
 
+% Add a node to a node cluster.
+%
+% #1 = name of the cluster.
+% #2 = name of the node to add.
+%
+% Description:
+%
+% This adds the node #2 to the cluster with the name #1.
+%
+% Clusters can be used to group nodes logically and, depending on the
+% type of drawing, influence the behavior of certain graph drawing 
+% algorithms. A layered drawing algorithm, for instance, could place
+% nodes in a cluster with the name "minimum layer" at the minimum 
+% layer in the final drawing.
+
+\def\pgfgdaddnodetocluster#1#2{
+  \directlua{pgf.graphdrawing.Interface:addNodeToCluster("\luaescapestring{#2}", "\luaescapestring{#1}")}
+}
 
 
 
@@ -933,16 +981,24 @@
     \pgfkeysgetvalue{/graph drawing/node parameters}\pgf@gd@node@options
     % save pgfpositionnodelaterbox (see manual)
     \setbox\pgf@gd@box=\box\pgfpositionnodelaterbox\relax
+    % save late setup options
+    \expandafter\toks\expandafter0\expandafter0=\expandafter{\pgfpositionnodelaterpostsetup}%
+    % evaluate coordinates
+    \pgfmathsetmacro{\pgf@gd@node@minx}{\pgfpositionnodelaterminx}%
+    \pgfmathsetmacro{\pgf@gd@node@miny}{\pgfpositionnodelaterminy}%
+    \pgfmathsetmacro{\pgf@gd@node@maxx}{\pgfpositionnodelatermaxx}%
+    \pgfmathsetmacro{\pgf@gd@node@maxy}{\pgfpositionnodelatermaxy}%
     % call lua system library to create a lua node object
     \directlua{
-      %% NOTE: options parameter has to be the key=value string
+      %% NOTE: options parameter has to be the {key1}{value1}{key2}{value2} string
       pgf.graphdrawing.Interface:addNode(
         "\luaescapestring{\pgfpositionnodelatername}",
-        "\luaescapestring{\pgfpositionnodelaterminx}",
-        "\luaescapestring{\pgfpositionnodelaterminy}",
-        "\luaescapestring{\pgfpositionnodelatermaxx}",
-        "\luaescapestring{\pgfpositionnodelatermaxy}",
-        "\luaescapestring{\pgf@gd@node@options}") }
+        "\luaescapestring{\pgf@gd@node@minx}",
+        "\luaescapestring{\pgf@gd@node@miny}",
+        "\luaescapestring{\pgf@gd@node@maxx}",
+        "\luaescapestring{\pgf@gd@node@maxy}",
+        "\luaescapestring{\pgf@gd@node@options}",
+        "\luaescapestring{\the\toks0}") }
   }%
 }
 
@@ -957,6 +1013,7 @@
 % #6 = desired x pos of the node
 % #7 = desired y pos of the node
 % #8 = box register number of the TeX node
+% #9 = the late setup options
 %
 % This is an internal function and will be called by the Sys-class of the Lua part
 %
@@ -964,7 +1021,7 @@
 %
 %  \pgfgdinternalshipoutnode{not yet positionedPGFINTERNALnodename}{10}{10}{20}{20}{10pt}{10pt}0
 % 
-\def\pgfgdinternalshipoutnode#1#2#3#4#5#6#7#8{%
+\def\pgfgdinternalshipoutnode#1#2#3#4#5#6#7#8#9{%
   {%
     \pgfgdlogmessage{GD:TEX: positioning node #1 (#2,#3,#4,#5) to #6,#7 from register #8}\relax
     \def\pgfpositionnodelatername{#1}
@@ -972,6 +1029,7 @@
     \def\pgfpositionnodelatermaxx{#3}
     \def\pgfpositionnodelaterminy{#4}
     \def\pgfpositionnodelatermaxy{#5}
+    \def\pgfpositionnodelaterpostsetup{#9}
     \setbox\pgf@gd@box=\box\pgfutil@voidb@x
     \directlua{
       texnode = pgf.graphdrawing.TeXBoxRegister:getBox(#8)
