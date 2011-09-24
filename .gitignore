@@ -7,3 +7,10 @@
 *~
 *.log
 CVS
+*.idx
+*.toc
+*.out
+*.aux
+*.ilg
+*.ind
+*.pdf
