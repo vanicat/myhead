@@ -101,6 +101,14 @@
 \let\EURbis\EUR
 \renewcommand\EUR[1]{\text{\EURbis{\num{#1}}}}
 
+%algorithm:
+\RequirePackage{algorithmicx}
+\newcommand{\Variables}[2][Nombres]{\State \textbf{Variables} \(#2\) : #1}
+\newcommand{\Entrees}[1]{\State \textbf{Entrées} : Lire(\(#1\))}
+\newcommand{\Resultat}[1]{\State \textbf{Résultat} : Écrire(\(#1\))}
+\algblockdefx{Debut}{Fin}{\textbf{Début}}{\textbf{Fin}}
+
+
 %\RequirePackage{mathabx}
 \RequirePackage{enumerate}
 \RequirePackage{multicol}
@@ -250,6 +258,8 @@
 %%% mode: latex
 %%% TeX-master: "cours_triangles_isométriques"
 %%% TeX-PDF-mode: t
+%%% TeX-parse-self: t
+%%% TeX-auto-save: t
 %%% End:
 
 % LocalWords:  isométriques d'isométrie
