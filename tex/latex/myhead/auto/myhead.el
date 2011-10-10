@@ -38,6 +38,7 @@
      '("header" 1)
      '("languagepath" 1)
      '("uselanguage" 1)
+     '("Affect" 2)
      '("Resultat" 1)
      '("Entrees" 1)
      "nomprenom"
@@ -69,6 +70,7 @@
      "vk"
      "vO"
      "Oij"
+     "OIJ"
      "Oijk"
      "framesecsub"
      "framesec"

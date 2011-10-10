@@ -106,7 +106,10 @@
 \newcommand{\Variables}[2][Nombres]{\State \textbf{Variables} \(#2\) : #1}
 \newcommand{\Entrees}[1]{\State \textbf{Entrées} : Lire(\(#1\))}
 \newcommand{\Resultat}[1]{\State \textbf{Résultat} : Écrire(\(#1\))}
+\newcommand{\Affect}[2]{\State \(#1 \gets #2\)}
 \algblockdefx{Debut}{Fin}{\textbf{Début}}{\textbf{Fin}}
+\algblockdefx[Si]{Si}{FinSi}[1]{\textbf{Si} #1 \textbf{alors}}{\textbf{Fin Si}}
+\algcblock[Si]{Si}{Sinon}{FinSi}
 
 
 %\RequirePackage{mathabx}
@@ -241,6 +244,7 @@
 \newcommand{\vk}{\vect{k}}
 \newcommand{\vO}{\vect{O}}
 \newcommand{\Oij}{$(O,\vi,\vj)$}
+\newcommand{\OIJ}{$(O,I,J)$}
 \newcommand{\Oijk}{$(O,\vi,\vj,\vk$}
 
 \newenvironment{myeqn}{\par\(\begin{array}{r@{\displaystyle}c@{\displaystyle}l@{\displaystyle}}}{\end{array}\)\par}
