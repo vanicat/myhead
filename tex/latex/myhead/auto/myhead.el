@@ -59,6 +59,7 @@
      "ch"
      "renum"
      "enum"
+     "dotline"
      "snum"
      "slinez"
      "sline"
