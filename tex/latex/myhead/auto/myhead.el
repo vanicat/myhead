@@ -39,6 +39,7 @@
      '("languagepath" 1)
      '("uselanguage" 1)
      '("Affect" 2)
+     '("Ecrire" 1)
      '("Resultat" 1)
      '("Entrees" 1)
      "nomprenom"

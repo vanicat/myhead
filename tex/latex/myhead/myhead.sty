@@ -107,11 +107,13 @@
 \newcommand{\Variables}[2][Nombres]{\State \textbf{Variables} \(#2\) : #1}
 \newcommand{\Entrees}[1]{\State \textbf{Entrées} : Lire(\(#1\))}
 \newcommand{\Resultat}[1]{\State \textbf{Résultat} : Écrire(\(#1\))}
+\newcommand{\Ecrire}[1]{\State \textbf{Écrire}(\(#1\))}
 \newcommand{\Affect}[2]{\State \(#1 \gets #2\)}
 \algblockdefx{Debut}{Fin}{\textbf{Début}}{\textbf{Fin}}
 \algblockdefx[Si]{Si}{FinSi}[1]{\textbf{Si} #1 \textbf{alors}}{\textbf{Fin Si}}
 \algcblock[Si]{Si}{Sinon}{FinSi}
 \algblockdefx[Pour]{Pour}{FinPour}[3]{\textbf{Pour} #1 \textbf{allant de} #2 \textbf{à} #3}{\textbf{Fin Pour}}
+\algblockdefx[Tantque]{TantQue}{FinTantQue}[1]{\textbf{Tant Que} #1}{\textbf{Fin Tant Que}}
 
 %\RequirePackage{mathabx}
 \RequirePackage{enumerate}
