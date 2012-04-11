@@ -7,6 +7,8 @@
      "Exems"
      "Theo"
      "Cor"
+     "Conq"
+     "Conqs"
      "Def"
      "Defs"
      "Meth"
