@@ -26,6 +26,7 @@
     (TeX-add-symbols
      '("dx" ["argument"] 0)
      '("CM" ["argument"] 0)
+     '("header" ["argument"] 1)
      '("Variables" ["argument"] 1)
      '("mr" 1)
      '("mdr" 1)
@@ -37,7 +38,6 @@
      '("dset" 2)
      '("set" 1)
      '("pa" 1)
-     '("header" 1)
      '("languagepath" 1)
      '("uselanguage" 1)
      '("Affect" 2)
