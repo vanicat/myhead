@@ -27,6 +27,7 @@
      '("dx" ["argument"] 0)
      '("CM" ["argument"] 0)
      '("header" ["argument"] 1)
+     '("NoVariables" ["argument"] 1)
      '("Variables" ["argument"] 1)
      '("mr" 1)
      '("mdr" 1)
@@ -43,6 +44,7 @@
      '("Affect" 2)
      '("Ecrire" 1)
      '("Resultat" 1)
+     '("Entree" 1)
      '("Entrees" 1)
      "nomprenom"
      "nohead"
