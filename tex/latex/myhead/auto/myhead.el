@@ -33,6 +33,7 @@
      '("mdr" 1)
      '("dr" 1)
      '("mseg" 1)
+     '("interval" 2)
      '("seg" 1)
      '("vcoord" 2)
      '("vectr" 1)
