@@ -24,6 +24,7 @@
      "lastpage"
      "fancyhdr"
      "graphicx"
+     "tkz-tab"
      "tikz"
      "variations"
      "pgf"
