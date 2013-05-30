@@ -46,6 +46,7 @@
      '("Ecrire" 1)
      '("Resultat" 1)
      '("Entree" 1)
+     '("Lire" 1)
      '("Entrees" 1)
      "ExoName"
      "nomprenom"
