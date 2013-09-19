@@ -26,6 +26,7 @@
     (TeX-add-symbols
      '("dx" ["argument"] 0)
      '("CM" ["argument"] 0)
+     '("nohead" ["argument"] 0)
      '("header" ["argument"] 1)
      '("NoVariables" ["argument"] 1)
      '("Variables" ["argument"] 1)
@@ -50,7 +51,6 @@
      '("Entrees" 1)
      "ExoName"
      "nomprenom"
-     "nohead"
      "dsum"
      "doplus"
      "dint"
