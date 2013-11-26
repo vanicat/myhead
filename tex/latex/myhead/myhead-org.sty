@@ -16,6 +16,7 @@
 \RequirePackage{graphicx}
 \RequirePackage{fancyhdr}
 \RequirePackage{lastpage}
+\RequirePackage{array}
 
 
 \DeclareUnicodeCharacter{0391}{\ensuremath{\Alpha}}
@@ -114,6 +115,11 @@
 
 \newtheoremstyle{myrem}{6pt}{12pt}{}{}{\bf}{}{\newline}{%
   \thmname{#1} \thmnumber{#2}\makeatletter \@ifempty{#3}{:}{: \thmnote{#3}.}}
+
+\newcounter{enumtwoi}
+\renewcommand{\theenumtwoi}{\Alph{enumtwoi})\ \ }
+\newcommand{\itemtwo}{\stepcounter{enumtwoi}\theenumtwoi}
+\newenvironment{enumtwo}{\setcounter{enumtwoi}{0}\begin{tabular}{>{\itemtwo}p{0.45\linewidth}>{\itemtwo}p{0.45\linewidth}}}{\end{tabular}}
 
 %\theoremheaderfont{\bfseries\renewcommand{\thesection}{\arabic{section}}}
 

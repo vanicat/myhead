@@ -1,6 +1,7 @@
 (TeX-add-style-hook "myhead-org"
  (lambda ()
     (LaTeX-add-environments
+     "enumtwo"
      "Exo"
      "Sol"
      "Exem"
@@ -49,6 +50,7 @@
      '("Entree" 1)
      '("Lire" 1)
      '("Entrees" 1)
+     "itemtwo"
      "ExoName"
      "nomprenom"
      "dsum"
@@ -102,6 +104,7 @@
      "amsthm"
      "amstext"
      "amsfonts"
+     "array"
      "lastpage"
      "fancyhdr"
      "graphicx"
